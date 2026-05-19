@@ -30,28 +30,30 @@ import java.util.concurrent.TimeUnit;
  */
 public class KalkulatorTrapesiumGUI extends JFrame {
 
-    // ── Konstanta warna & font (tema dark-academic / blueprint) ──────────────
-    private static final Color BG_DARK      = new Color(13, 17, 28);
-    private static final Color BG_PANEL     = new Color(20, 26, 42);
-    private static final Color BG_CARD      = new Color(28, 36, 56);
-    private static final Color BG_INPUT     = new Color(18, 23, 38);
-    private static final Color ACCENT_BLUE  = new Color(64, 156, 255);
-    private static final Color ACCENT_CYAN  = new Color(0, 212, 200);
-    private static final Color ACCENT_GOLD  = new Color(255, 196, 64);
-    private static final Color TEXT_PRIMARY = new Color(220, 230, 250);
-    private static final Color TEXT_MUTED   = new Color(110, 130, 170);
-    private static final Color BORDER_COLOR = new Color(45, 60, 90);
-    private static final Color ROW_ALT      = new Color(24, 32, 50);
-    private static final Color HEADER_TBL   = new Color(35, 50, 80);
+    // ── Konstanta warna (color palette baru) ──────────────
+    private static final Color BG_DARK      = new Color(22, 38, 96);      // #162660
+    private static final Color BG_PANEL     = new Color(22, 38, 96);      // #162660
+    private static final Color BG_CARD      = new Color(22, 38, 96);      // #162660
+    private static final Color BG_INPUT     = new Color(22, 38, 96);      // #162660
+    private static final Color ACCENT_BLUE  = new Color(208, 230, 253);   // #D0E6FD
+    private static final Color ACCENT_DARK  = new Color(13, 17, 28);
+    private static final Color ACCENT_CYAN  = new Color(0, 40, 42);   // #D0E6FD
+    private static final Color ACCENT_GOLD  = new Color(241, 228, 209);   // #F1E4D1
+    private static final Color TEXT_PRIMARY = new Color(241, 228, 209);   // #F1E4D1
+    private static final Color TEXT_MUTED   = new Color(208, 230, 253);   // #D0E6FD
+    private static final Color BORDER_COLOR = new Color(208, 230, 253);   // #D0E6FD
+    private static final Color ROW_ALT      = new Color(35, 55, 120);     // lebih terang dari #162660
+    private static final Color HEADER_TBL   = new Color(208, 230, 253);   // #D0E6FD
 
-    private static final Font FONT_TITLE  = new Font("Serif", Font.BOLD, 22);
-    private static final Font FONT_SUB    = new Font("Monospaced", Font.PLAIN, 11);
-    private static final Font FONT_LABEL  = new Font("SansSerif", Font.BOLD, 12);
-    private static final Font FONT_INPUT  = new Font("Monospaced", Font.PLAIN, 14);
-    private static final Font FONT_BTN    = new Font("SansSerif", Font.BOLD, 13);
-    private static final Font FONT_TABLE  = new Font("Monospaced", Font.PLAIN, 11);
-    private static final Font FONT_HEADER = new Font("SansSerif", Font.BOLD, 11);
-    private static final Font FONT_STAT   = new Font("Monospaced", Font.BOLD, 18);
+    // ── Font yang diperbesar ─────────────────────────────────────────────────
+    private static final Font FONT_TITLE  = new Font("Serif", Font.BOLD, 28);
+    private static final Font FONT_SUB    = new Font("Monospaced", Font.PLAIN, 14);
+    private static final Font FONT_LABEL  = new Font("SansSerif", Font.BOLD, 16);
+    private static final Font FONT_INPUT  = new Font("Monospaced", Font.PLAIN, 18);
+    private static final Font FONT_BTN    = new Font("SansSerif", Font.BOLD, 16);
+    private static final Font FONT_TABLE  = new Font("Monospaced", Font.PLAIN, 14);
+    private static final Font FONT_HEADER = new Font("SansSerif", Font.BOLD, 14);
+    private static final Font FONT_STAT   = new Font("Monospaced", Font.BOLD, 24);
 
     // ── Komponen input ────────────────────────────────────────────────────────
     private JSpinner spnData;
@@ -75,8 +77,8 @@ public class KalkulatorTrapesiumGUI extends JFrame {
     public KalkulatorTrapesiumGUI() {
         setTitle("Kalkulator Trapesium — Multithreading");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(1200, 700));
-        setPreferredSize(new Dimension(1400, 820));
+        setMinimumSize(new Dimension(1400, 800));
+        setPreferredSize(new Dimension(1600, 950));
         getContentPane().setBackground(BG_DARK);
         setLayout(new BorderLayout(0, 0));
 
@@ -98,38 +100,38 @@ public class KalkulatorTrapesiumGUI extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g;
                 // gradient latar header
-                GradientPaint gp = new GradientPaint(0, 0, new Color(18, 28, 55),
-                        getWidth(), 0, new Color(10, 20, 40));
+                GradientPaint gp = new GradientPaint(0, 0, BG_DARK,
+                        getWidth(), 0, new Color(30, 50, 110));
                 g2.setPaint(gp);
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 // garis bawah accent
                 g2.setColor(ACCENT_BLUE);
-                g2.setStroke(new BasicStroke(2));
+                g2.setStroke(new BasicStroke(3));
                 g2.drawLine(0, getHeight() - 2, getWidth(), getHeight() - 2);
             }
         };
-        p.setPreferredSize(new Dimension(0, 80));
-        p.setBorder(new EmptyBorder(14, 28, 14, 28));
+        p.setPreferredSize(new Dimension(0, 100));
+        p.setBorder(new EmptyBorder(20, 32, 20, 32));
 
         // kiri: judul
-        JPanel left = new JPanel(new GridLayout(2, 1, 0, 2));
+        JPanel left = new JPanel(new GridLayout(2, 1, 0, 5));
         left.setOpaque(false);
         JLabel title = new JLabel("KALKULATOR TRAPESIUM");
         title.setFont(FONT_TITLE);
-        title.setForeground(TEXT_PRIMARY);
+        title.setForeground(ACCENT_GOLD);
         JLabel sub = new JLabel("Prisma & Limas  ·  Concurrent Multithreading  ·  Java Swing GUI");
         sub.setFont(FONT_SUB);
-        sub.setForeground(TEXT_MUTED);
+        sub.setForeground(ACCENT_BLUE);
         left.add(title);
         left.add(sub);
 
         // kanan: badge versi
-        JLabel badge = new JLabel("v2.0  GUI");
-        badge.setFont(new Font("Monospaced", Font.BOLD, 11));
-        badge.setForeground(ACCENT_CYAN);
+        JLabel badge = new JLabel("Kelompok 2");
+        badge.setFont(new Font("Monospaced", Font.BOLD, 14));
+        badge.setForeground(ACCENT_BLUE);
         badge.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ACCENT_CYAN, 1, true),
-                new EmptyBorder(4, 10, 4, 10)));
+                BorderFactory.createLineBorder(ACCENT_BLUE, 2, true),
+                new EmptyBorder(6, 14, 6, 14)));
 
         p.add(left,  BorderLayout.WEST);
         p.add(badge, BorderLayout.EAST);
@@ -142,8 +144,8 @@ public class KalkulatorTrapesiumGUI extends JFrame {
     private JSplitPane buildCenter() {
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 buildLeftPanel(), buildRightPanel());
-        split.setDividerLocation(300);
-        split.setDividerSize(4);
+        split.setDividerLocation(350);
+        split.setDividerSize(5);
         split.setBorder(null);
         split.setBackground(BG_DARK);
         return split;
@@ -154,41 +156,37 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBackground(BG_PANEL);
-        p.setBorder(new EmptyBorder(20, 20, 20, 20));
+        p.setBorder(new EmptyBorder(25, 25, 25, 25));
 
         p.add(sectionTitle("⚙  KONFIGURASI"));
-        p.add(Box.createVerticalStrut(16));
+        p.add(Box.createVerticalStrut(20));
 
         // ── input jumlah data ──
         p.add(inputLabel("Jumlah Data", "Banyak trapesium yang digenerate secara acak"));
-        p.add(Box.createVerticalStrut(6));
+        p.add(Box.createVerticalStrut(8));
         spnData = styledSpinner(100, 1, 100_000, 50);
         p.add(spnData);
-        p.add(Box.createVerticalStrut(16));
+        p.add(Box.createVerticalStrut(20));
 
         // ── input jumlah thread ──
         p.add(inputLabel("Jumlah Thread", "Ukuran thread pool (ExecutorService)"));
-        p.add(Box.createVerticalStrut(6));
+        p.add(Box.createVerticalStrut(8));
         spnThread = styledSpinner(4, 1, 64, 1);
         p.add(spnThread);
-        p.add(Box.createVerticalStrut(24));
-
-        // ── info rentang nilai ──
-        p.add(infoCard());
-        p.add(Box.createVerticalStrut(24));
+        p.add(Box.createVerticalStrut(30));
 
         // ── tombol ──
         btnHitung = buildButton("▶   HITUNG", ACCENT_BLUE);
         btnHitung.addActionListener(e -> jalankanPerhitungan());
         btnHitung.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnHitung.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+        btnHitung.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
         p.add(btnHitung);
-        p.add(Box.createVerticalStrut(8));
+        p.add(Box.createVerticalStrut(12));
 
-        btnReset = buildButton("↺   RESET", new Color(60, 70, 95));
+        btnReset = buildButton("↺   RESET", ACCENT_GOLD);
         btnReset.addActionListener(e -> resetUI());
         btnReset.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnReset.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        btnReset.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         p.add(btnReset);
 
         p.add(Box.createVerticalGlue());
@@ -211,7 +209,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         tabs = new JTabbedPane();
         tabs.setFont(FONT_LABEL);
         tabs.setBackground(BG_DARK);
-        tabs.setForeground(TEXT_PRIMARY);
+        tabs.setForeground(ACCENT_GOLD);
 
         // tab Prisma
         modelPrisma = buildTableModel(
@@ -234,16 +232,16 @@ public class KalkulatorTrapesiumGUI extends JFrame {
 
     // ─── BARIS STATISTIK WAKTU ────────────────────────────────────────────────
     private JPanel buildStatRow() {
-        JPanel row = new JPanel(new GridLayout(1, 3, 8, 0));
+        JPanel row = new JPanel(new GridLayout(1, 3, 12, 0));
         row.setBackground(BG_DARK);
-        row.setBorder(new EmptyBorder(12, 16, 12, 16));
+        row.setBorder(new EmptyBorder(16, 20, 16, 20));
 
         lblTimePrisma = new JLabel("— ms", SwingConstants.CENTER);
         lblTimeLimas  = new JLabel("— ms", SwingConstants.CENTER);
         lblTimeTotal  = new JLabel("— ms", SwingConstants.CENTER);
 
         row.add(statCard("PRISMA",   lblTimePrisma, ACCENT_BLUE));
-        row.add(statCard("LIMAS",    lblTimeLimas,  ACCENT_CYAN));
+        row.add(statCard("LIMAS",    lblTimeLimas,  ACCENT_BLUE));
         row.add(statCard("TOTAL",    lblTimeTotal,  ACCENT_GOLD));
         return row;
     }
@@ -252,22 +250,22 @@ public class KalkulatorTrapesiumGUI extends JFrame {
     //  FOOTER
     // ══════════════════════════════════════════════════════════════════════════
     private JPanel buildFooter() {
-        JPanel p = new JPanel(new BorderLayout(10, 0));
-        p.setBackground(new Color(10, 14, 24));
+        JPanel p = new JPanel(new BorderLayout(15, 0));
+        p.setBackground(BG_DARK);
         p.setBorder(new CompoundBorder(
-                new MatteBorder(1, 0, 0, 0, BORDER_COLOR),
-                new EmptyBorder(6, 18, 6, 18)));
+                new MatteBorder(2, 0, 0, 0, ACCENT_BLUE),
+                new EmptyBorder(10, 22, 10, 22)));
 
         progressBar = new JProgressBar();
         progressBar.setIndeterminate(false);
-        progressBar.setPreferredSize(new Dimension(200, 10));
-        progressBar.setBackground(BG_CARD);
-        progressBar.setForeground(ACCENT_BLUE);
+        progressBar.setPreferredSize(new Dimension(250, 14));
+        progressBar.setBackground(new Color(50, 70, 130));
+        progressBar.setForeground(ACCENT_GOLD);
         progressBar.setBorderPainted(false);
 
         lblStatus = new JLabel("Siap. Masukkan parameter lalu klik Hitung.");
         lblStatus.setFont(FONT_SUB);
-        lblStatus.setForeground(TEXT_MUTED);
+        lblStatus.setForeground(ACCENT_BLUE);
 
         p.add(lblStatus,    BorderLayout.WEST);
         p.add(progressBar,  BorderLayout.EAST);
@@ -430,19 +428,19 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         JSpinner sp = new JSpinner(new SpinnerNumberModel(val, min, max, step));
         sp.setFont(FONT_INPUT);
         sp.setBackground(BG_INPUT);
-        sp.setForeground(TEXT_PRIMARY);
+        sp.setForeground(ACCENT_GOLD);
         JComponent editor = sp.getEditor();
         editor.setBackground(BG_INPUT);
         if (editor instanceof JSpinner.DefaultEditor de) {
             de.getTextField().setBackground(BG_INPUT);
-            de.getTextField().setForeground(ACCENT_CYAN);
-            de.getTextField().setCaretColor(TEXT_PRIMARY);
-            de.getTextField().setBorder(new EmptyBorder(4, 8, 4, 8));
+            de.getTextField().setForeground(ACCENT_DARK);
+            de.getTextField().setCaretColor(ACCENT_BLUE);
+            de.getTextField().setBorder(new EmptyBorder(6, 10, 6, 10));
             de.getTextField().setFont(FONT_INPUT);
         }
-        sp.setBorder(BorderFactory.createLineBorder(BORDER_COLOR, 1));
+        sp.setBorder(BorderFactory.createLineBorder(ACCENT_BLUE, 2));
         sp.setAlignmentX(Component.LEFT_ALIGNMENT);
-        sp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        sp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         return sp;
     }
 
@@ -455,11 +453,11 @@ public class KalkulatorTrapesiumGUI extends JFrame {
 
         JLabel lbl = new JLabel(label);
         lbl.setFont(FONT_LABEL);
-        lbl.setForeground(TEXT_PRIMARY);
+        lbl.setForeground(ACCENT_GOLD);
 
         JLabel hint2 = new JLabel(hint);
-        hint2.setFont(new Font("SansSerif", Font.PLAIN, 10));
-        hint2.setForeground(TEXT_MUTED);
+        hint2.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        hint2.setForeground(ACCENT_BLUE);
 
         p.add(lbl);
         p.add(hint2);
@@ -469,59 +467,42 @@ public class KalkulatorTrapesiumGUI extends JFrame {
     /** Judul seksi */
     private JLabel sectionTitle(String text) {
         JLabel l = new JLabel(text);
-        l.setFont(new Font("SansSerif", Font.BOLD, 13));
-        l.setForeground(ACCENT_BLUE);
+        l.setFont(new Font("SansSerif", Font.BOLD, 18));
+        l.setForeground(ACCENT_GOLD);
         l.setAlignmentX(Component.LEFT_ALIGNMENT);
         return l;
     }
-
-    /** Kartu info rentang nilai */
-    private JPanel infoCard() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBackground(BG_CARD);
-        p.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER_COLOR, 1, true),
-                new EmptyBorder(10, 14, 10, 14)));
-        p.setAlignmentX(Component.LEFT_ALIGNMENT);
-        p.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-
-        addInfoRow(p, "Rentang nilai sisi",
-                String.format("%.0f – %.0f satuan", MIN_SISI, MAX_SISI));
-        addInfoRow(p, "Generator", "java.util.Random");
-        addInfoRow(p, "Thread pool", "Executors.newFixedThreadPool");
-        return p;
-    }
-
+    
     private void addInfoRow(JPanel parent, String key, String val) {
         JPanel row = new JPanel(new BorderLayout());
         row.setOpaque(false);
         JLabel k = new JLabel(key);
-        k.setFont(new Font("SansSerif", Font.PLAIN, 10));
-        k.setForeground(TEXT_MUTED);
+        k.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        k.setForeground(ACCENT_BLUE);
         JLabel v = new JLabel(val);
-        v.setFont(new Font("Monospaced", Font.PLAIN, 10));
-        v.setForeground(ACCENT_CYAN);
+        v.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        v.setForeground(ACCENT_GOLD);
         row.add(k, BorderLayout.WEST);
         row.add(v, BorderLayout.EAST);
         parent.add(row);
+        parent.add(Box.createVerticalStrut(6));
     }
 
     /** Kartu OOP concepts */
     private JPanel oopCard() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBackground(new Color(20, 32, 28));
+        p.setBackground(new Color(30, 50, 110));
         p.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(0, 120, 90), 1, true),
-                new EmptyBorder(10, 14, 10, 14)));
+                BorderFactory.createLineBorder(ACCENT_GOLD, 2, true),
+                new EmptyBorder(14, 18, 14, 18)));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel title = new JLabel("Konsep OOP yang digunakan");
-        title.setFont(new Font("SansSerif", Font.BOLD, 10));
-        title.setForeground(ACCENT_CYAN);
+        title.setFont(new Font("SansSerif", Font.BOLD, 14));
+        title.setForeground(ACCENT_GOLD);
         p.add(title);
-        p.add(Box.createVerticalStrut(6));
+        p.add(Box.createVerticalStrut(10));
 
         for (String s : new String[]{
                 "✔  Abstraksi  (Trapesium abstract)",
@@ -532,9 +513,10 @@ public class KalkulatorTrapesiumGUI extends JFrame {
                 "✔  Interface  (Geometri2D, Geometri3D)",
                 "✔  Multithreading  (Thread + ExecutorService)"}) {
             JLabel l = new JLabel(s);
-            l.setFont(new Font("Monospaced", Font.PLAIN, 10));
-            l.setForeground(new Color(130, 210, 170));
+            l.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            l.setForeground(ACCENT_BLUE);
             p.add(l);
+            p.add(Box.createVerticalStrut(4));
         }
         return p;
     }
@@ -550,15 +532,15 @@ public class KalkulatorTrapesiumGUI extends JFrame {
                         : getModel().isRollover() ? bg.brighter()
                         : bg;
                 g2.setColor(c);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
-                g2.setColor(bg.brighter().brighter());
-                g2.setStroke(new BasicStroke(1));
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.setColor(bg.brighter());
+                g2.setStroke(new BasicStroke(2));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
                 super.paintComponent(g);
             }
         };
         b.setFont(FONT_BTN);
-        b.setForeground(Color.WHITE);
+        b.setForeground(BG_DARK);
         b.setContentAreaFilled(false);
         b.setBorderPainted(false);
         b.setFocusPainted(false);
@@ -569,23 +551,23 @@ public class KalkulatorTrapesiumGUI extends JFrame {
 
     /** Kartu statistik waktu */
     private JPanel statCard(String label, JLabel valueLabel, Color accent) {
-        JPanel p = new JPanel(new GridLayout(3, 1, 0, 2));
-        p.setBackground(BG_CARD);
+        JPanel p = new JPanel(new GridLayout(3, 1, 0, 4));
+        p.setBackground(new Color(30, 50, 110));
         p.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(accent.darker(), 1, true),
-                new EmptyBorder(10, 16, 10, 16)));
+                BorderFactory.createLineBorder(accent, 2, true),
+                new EmptyBorder(14, 20, 14, 20)));
 
         JLabel lbl = new JLabel(label, SwingConstants.CENTER);
-        lbl.setFont(new Font("SansSerif", Font.BOLD, 10));
-        lbl.setForeground(TEXT_MUTED);
+        lbl.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lbl.setForeground(ACCENT_BLUE);
 
         valueLabel.setFont(FONT_STAT);
         valueLabel.setForeground(accent);
         valueLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         JLabel sub = new JLabel("waktu eksekusi", SwingConstants.CENTER);
-        sub.setFont(new Font("SansSerif", Font.PLAIN, 9));
-        sub.setForeground(TEXT_MUTED);
+        sub.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        sub.setForeground(ACCENT_BLUE);
 
         p.add(lbl);
         p.add(valueLabel);
@@ -604,12 +586,12 @@ public class KalkulatorTrapesiumGUI extends JFrame {
     private JTable buildTable(DefaultTableModel model) {
         JTable t = new JTable(model);
         t.setFont(FONT_TABLE);
-        t.setForeground(TEXT_PRIMARY);
+        t.setForeground(ACCENT_GOLD);
         t.setBackground(BG_DARK);
-        t.setGridColor(BORDER_COLOR);
-        t.setRowHeight(22);
-        t.setSelectionBackground(new Color(50, 80, 130));
-        t.setSelectionForeground(Color.WHITE);
+        t.setGridColor(ACCENT_BLUE);
+        t.setRowHeight(30);
+        t.setSelectionBackground(new Color(208, 230, 253, 100));
+        t.setSelectionForeground(ACCENT_GOLD);
         t.setShowVerticalLines(true);
         t.setShowHorizontalLines(true);
         t.setAutoCreateRowSorter(true); // klik header untuk sort
@@ -618,7 +600,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         JTableHeader header = t.getTableHeader();
         header.setFont(FONT_HEADER);
         header.setBackground(HEADER_TBL);
-        header.setForeground(ACCENT_BLUE);
+        header.setForeground(BG_DARK);
         header.setReorderingAllowed(false);
 
         // renderer warna baris selang-seling
@@ -629,17 +611,17 @@ public class KalkulatorTrapesiumGUI extends JFrame {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
                 if (!isSelected) {
                     setBackground(row % 2 == 0 ? BG_DARK : ROW_ALT);
-                    setForeground(col == 0 ? TEXT_MUTED : TEXT_PRIMARY);
+                    setForeground(col == 0 ? ACCENT_BLUE : ACCENT_GOLD);
                 }
-                setFont(col == 0 ? new Font("Monospaced", Font.BOLD, 11) : FONT_TABLE);
-                setBorder(new EmptyBorder(0, 6, 0, 6));
+                setFont(col == 0 ? new Font("Monospaced", Font.BOLD, 14) : FONT_TABLE);
+                setBorder(new EmptyBorder(0, 10, 0, 10));
                 setHorizontalAlignment(col == 0 ? CENTER : RIGHT);
                 return this;
             }
         });
 
         // lebar kolom
-        int[] widths = {36, 60, 60, 60, 60, 60, 80, 90, 80, 100, 110};
+        int[] widths = {45, 70, 70, 70, 70, 70, 90, 100, 90, 110, 120};
         for (int i = 0; i < Math.min(widths.length, t.getColumnCount()); i++)
             t.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
 
@@ -651,9 +633,9 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         JScrollPane sp = new JScrollPane(t);
         sp.setBackground(BG_DARK);
         sp.getViewport().setBackground(BG_DARK);
-        sp.setBorder(BorderFactory.createLineBorder(BORDER_COLOR, 1));
-        sp.getVerticalScrollBar().setBackground(BG_PANEL);
-        sp.getHorizontalScrollBar().setBackground(BG_PANEL);
+        sp.setBorder(BorderFactory.createLineBorder(ACCENT_BLUE, 2));
+        sp.getVerticalScrollBar().setBackground(new Color(30, 50, 110));
+        sp.getHorizontalScrollBar().setBackground(new Color(30, 50, 110));
         return sp;
     }
 
@@ -670,7 +652,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
             }
         });
         tp.setBackground(BG_DARK);
-        tp.setForeground(TEXT_PRIMARY);
+        tp.setForeground(ACCENT_GOLD);
         tp.setBorder(null);
         tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     }
