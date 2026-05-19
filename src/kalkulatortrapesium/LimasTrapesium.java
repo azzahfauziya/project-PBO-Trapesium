@@ -8,6 +8,20 @@ package kalkulatortrapesium;
  *
  * @author ACER
  */
-public class LimasTrapesium {
+public class LimasTrapesium extends Trapesium implements Geometri3D{
+
+    public LimasTrapesium(double atas, double bawah, double luas, double keliling) {
+        super(atas, bawah, luas, keliling);
+    }
+
+    @Override
+    public double hitungVolume() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public double hitungLuasPermukaan() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 }

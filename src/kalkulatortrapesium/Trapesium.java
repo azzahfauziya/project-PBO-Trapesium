@@ -8,6 +8,34 @@ package kalkulatortrapesium;
  *
  * @author ACER
  */
-public class Trapesium {
+public abstract class Trapesium implements Geometri2D{
+    private double atas;
+    private double bawah;
+    private double luas;
+    private double keliling;
+    
+    public Trapesium(
+        double atas,
+        double bawah, 
+        double luas,
+        double keliling
+    ) {
+        this.atas = atas;
+        this.bawah = bawah;
+        this.luas = luas;
+        this.keliling = keliling;
+    }
+
+    
+    @Override
+    public double hitungLuas() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public double hitungKeliling() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
     
 }

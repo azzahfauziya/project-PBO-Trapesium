@@ -9,5 +9,6 @@ package kalkulatortrapesium;
  * @author ACER
  */
 public interface Geometri2D {
-    
+    double hitungLuas();
+    double hitungKeliling();
 }

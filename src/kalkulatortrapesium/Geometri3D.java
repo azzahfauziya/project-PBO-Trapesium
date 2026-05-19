@@ -9,5 +9,6 @@ package kalkulatortrapesium;
  * @author ACER
  */
 public interface Geometri3D {
-    
+    double hitungVolume();
+    double hitungLuasPermukaan();
 }
