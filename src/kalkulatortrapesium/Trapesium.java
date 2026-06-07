@@ -8,18 +8,16 @@ package kalkulatortrapesium;
  * ✅ PEWARISAN    - diwarisi oleh PrismaTrapesium dan LimasTrapesium
  * ✅ MULTITHREADING - perhitungan dilakukan di thread terpisah
  */
-public abstract class Trapesium implements Geometri2D {
+public class Trapesium implements Geometri2D, Runnable{
 
     // ✅ ENKAPSULASI - semua atribut private
-    private double atas;     // panjang sisi atas trapesium
-    private double bawah;    // panjang sisi bawah trapesium
-    private double tinggi;   // tinggi trapesium
-    private double kiri;     // panjang sisi kiri trapesium
-    private double kanan;    // panjang sisi kanan trapesium
-
-    // Hasil perhitungan disimpan agar bisa diakses setelah thread selesai
-    private double hasilLuas;
-    private double hasilKeliling;
+    public double atas;     // panjang sisi atas trapesium
+    public double bawah;    // panjang sisi bawah trapesium
+    public double tinggi;   // tinggi trapesium
+    public double kiri;     // panjang sisi kiri trapesium
+    public double kanan;    // panjang sisi kanan trapesium
+    public double luas;
+    public double keliling;
 
     // ✅ OVERLOADING - konstruktor tanpa parameter (kosong)
     public Trapesium() {
@@ -39,86 +37,31 @@ public abstract class Trapesium implements Geometri2D {
         this.kanan  = kanan;
     }
 
-    // ======================== GETTER & SETTER ========================
-
-    public double getAtas()    { return atas; }
-    public double getBawah()   { return bawah; }
-    public double getTinggi()  { return tinggi; }
-    public double getKiri()    { return kiri; }
-    public double getKanan()   { return kanan; }
-
-    public void setAtas(double atas)      { this.atas = atas; }
-    public void setBawah(double bawah)    { this.bawah = bawah; }
-    public void setTinggi(double tinggi)  { this.tinggi = tinggi; }
-    public void setKiri(double kiri)      { this.kiri = kiri; }
-    public void setKanan(double kanan)    { this.kanan = kanan; }
-
-    public double getHasilLuas()      { return hasilLuas; }
-    public double getHasilKeliling()  { return hasilKeliling; }
-
-    // ======================== HITUNG LUAS ========================
-
-    /**
-     * Menghitung luas trapesium menggunakan thread terpisah
-     * Rumus: Luas = 1/2 × (atas + bawah) × tinggi
-     * ✅ MULTITHREADING - perhitungan dijalankan di thread terpisah
-     */
     @Override
     public double hitungLuas() {
-        // Buat thread untuk menghitung luas
-        Thread threadLuas = new Thread(() -> {
-            // Setengah dari jumlah sisi sejajar dikalikan tinggi
-            double jumlahSisiSejajar = atas + bawah;  // jumlahkan sisi atas dan bawah
-            double setengah = jumlahSisiSejajar / 2;  // bagi dua
-            hasilLuas = setengah * tinggi;             // kalikan dengan tinggi
-        });
-
-        threadLuas.start(); // mulai thread
-
-        try {
-            threadLuas.join(); // tunggu thread selesai sebelum melanjutkan
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.out.println("Thread luas trapesium terganggu: " + e.getMessage());
-        }
-
-        return hasilLuas;
+        luas = 0.5 * (atas + bawah) * tinggi;
+        return luas;
+    }
+    
+    public double hitungLuas(double atas, double bawah, double tinggi) {
+        luas = 0.5 * (atas + bawah) * tinggi;
+        return luas;
     }
 
-    // ======================== HITUNG KELILING ========================
-
-    /**
-     * Menghitung keliling trapesium menggunakan thread terpisah
-     * Rumus: Keliling = atas + bawah + kiri + kanan
-     * ✅ MULTITHREADING - perhitungan dijalankan di thread terpisah
-     */
     @Override
     public double hitungKeliling() {
-        // Buat thread untuk menghitung keliling
-        Thread threadKeliling = new Thread(() -> {
-            // Jumlahkan semua sisi trapesium
-            double jumlahAtasBawah = atas + bawah;   // sisi sejajar atas dan bawah
-            double jumlahKiriKanan = kiri + kanan;   // sisi miring kiri dan kanan
-            hasilKeliling = jumlahAtasBawah + jumlahKiriKanan; // total semua sisi
-        });
-
-        threadKeliling.start(); // mulai thread
-
-        try {
-            threadKeliling.join(); // tunggu thread selesai
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.out.println("Thread keliling trapesium terganggu: " + e.getMessage());
-        }
-
-        return hasilKeliling;
+        double jumlahAtasBawah = atas + bawah;   // sisi sejajar atas dan bawah
+        double jumlahKiriKanan = kiri + kanan;   // sisi miring kiri dan kanan
+        keliling = jumlahAtasBawah + jumlahKiriKanan; // total semua sisi
+        
+        return keliling;
     }
-
-    // ======================== TO STRING ========================
-
-    @Override
-    public String toString() {
-        return String.format("Trapesium[atas=%.2f, bawah=%.2f, tinggi=%.2f, kiri=%.2f, kanan=%.2f]",
-                atas, bawah, tinggi, kiri, kanan);
+    
+    public double hitungKeliling(double atas, double bawah, double kiri, double kanan) {
+        double jumlahAtasBawah = atas + bawah;   // sisi sejajar atas dan bawah
+        double jumlahKiriKanan = kiri + kanan;   // sisi miring kiri dan kanan
+        keliling = jumlahAtasBawah + jumlahKiriKanan; // total semua sisi
+        
+        return keliling;
     }
 }

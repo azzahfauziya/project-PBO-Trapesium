@@ -75,7 +75,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
 
     // ─────────────────────────────────────────────────────────────────────────
     public KalkulatorTrapesiumGUI() {
-        setTitle("Kalkulator Trapesium — Multithreading");
+        setTitle("Kalkulator Trapesium");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1400, 800));
         setPreferredSize(new Dimension(1600, 950));
@@ -379,8 +379,10 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         return MIN_SISI + (rng.nextDouble() * (MAX_SISI - MIN_SISI));
     }
 
-    static void hitungDenganThread(List<? extends Trapesium> list,
-                                   int jumlahThread, String jenis) {
+    static void hitungDenganThread(
+        List<? extends Trapesium> list,
+        int jumlahThread, 
+        String jenis) {
         ExecutorService pool = Executors.newFixedThreadPool(jumlahThread);
         for (Trapesium obj : list) {
             pool.submit(() -> {

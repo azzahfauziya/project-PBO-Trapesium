@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * 3. Sistem menghitung dengan multithreading (ExecutorService)
  * 4. Sistem menampilkan waktu eksekusi dan hasil dalam bentuk tabel
  */
-public class KalkulatorTrapesium {
+public class main {
 
     // ======================== KONSTANTA ========================
     static final double MIN_SISI = 5.0;   // nilai minimum sisi random
