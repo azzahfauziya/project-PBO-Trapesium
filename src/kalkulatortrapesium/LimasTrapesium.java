@@ -1,39 +1,32 @@
 package kalkulatortrapesium;
 
 public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
+
     public double volume;
     public double luasPermukaan;
-    private double tinggiLimas;
-    
-    public void setTinggiLimas(double tinggiLimas){
-        this.tinggiLimas = tinggiLimas;
-    }
-    
-    public double getTinggiLimas(){
-        return tinggiLimas;
-    }
+    public double tinggiLimas;   // diubah dari private ke public, hapus setter/getter
 
-    // ✅ OVERLOADING - konstruktor kosong (tanpa parameter)
+    // OVERLOADING - konstruktor kosong
     public LimasTrapesium() {
-        super(); // panggil konstruktor Trapesium kosong
+        super();
         this.tinggiLimas = 0;
     }
 
-    // ✅ OVERLOADING - konstruktor dengan parameter lengkap
+    // OVERLOADING - konstruktor dengan parameter lengkap
     public LimasTrapesium(double atas, double bawah, double tinggi,
                           double kiri, double kanan, double tinggiLimas) {
-        super(atas, bawah, tinggi, kiri, kanan); // panggil konstruktor Trapesium berparameter
+        super(atas, bawah, tinggi, kiri, kanan);
         this.tinggiLimas = tinggiLimas;
     }
-    
+
     @Override
     public double hitungVolume() {
-        volume = 1/3 * (super.luas * tinggiLimas); 
+        volume = 1.0/3.0 * (super.luas * tinggiLimas);
         return volume;
     }
-    
+
     public double hitungVolume(double atas, double bawah, double tinggi) {
-        volume = 1/3 * (super.hitungLuas(atas, bawah, tinggi) * tinggiLimas); 
+        volume = 1.0/3.0 * (super.hitungLuas(atas, bawah, tinggi) * tinggiLimas);
         return volume;
     }
 
@@ -46,10 +39,10 @@ public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
         double apotemaKiriKanan  = Math.sqrt((tinggiLimas * tinggiLimas)
                                            + (proyeksiKiriKanan * proyeksiKiriKanan));
         luasPermukaan = luas
-                      + (0.5 * atas      * apotemaAtasBawah)
-                      + (0.5 * bawah     * apotemaAtasBawah)
-                      + (0.5 * kiri      * apotemaKiriKanan)
-                      + (0.5 * kanan     * apotemaKiriKanan);
+                      + (0.5 * atas   * apotemaAtasBawah)
+                      + (0.5 * bawah  * apotemaAtasBawah)
+                      + (0.5 * kiri   * apotemaKiriKanan)
+                      + (0.5 * kanan  * apotemaKiriKanan);
         return luasPermukaan;
     }
 
@@ -61,15 +54,24 @@ public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
         double apotemaKiriKanan  = Math.sqrt((tinggiLimas * tinggiLimas)
                                            + (proyeksiKiriKanan * proyeksiKiriKanan));
         luasPermukaan = luas
-                      + (0.5 * atas      * apotemaAtasBawah)
-                      + (0.5 * bawah     * apotemaAtasBawah)
-                      + (0.5 * kiri      * apotemaKiriKanan)
-                      + (0.5 * kanan     * apotemaKiriKanan);
+                      + (0.5 * atas   * apotemaAtasBawah)
+                      + (0.5 * bawah  * apotemaAtasBawah)
+                      + (0.5 * kiri   * apotemaKiriKanan)
+                      + (0.5 * kanan  * apotemaKiriKanan);
         return luasPermukaan;
     }
 
     @Override
     public void run() {
-    
+        System.out.println("[Thread-" + Thread.currentThread().getName() + "] Menghitung Limas: " + toString());
+        hitungLuas(atas, bawah, tinggi);
+        hitungKeliling(atas, bawah, kiri, kanan);
+        hitungVolume(atas, bawah, tinggi);
+        hitungLuasPermukaan(atas, bawah, tinggi, kiri, kanan);
+        System.out.println("[Thread-" + Thread.currentThread().getName() +
+                "] Selesai Limas -> Luas=" + String.format("%.2f", luas) +
+                ", Keliling=" + String.format("%.2f", keliling) +
+                ", Volume=" + String.format("%.2f", volume) +
+                ", LP=" + String.format("%.2f", luasPermukaan));
     }
 }

@@ -65,8 +65,13 @@ public class Trapesium implements Geometri2D, Runnable{
         return keliling;
     }
 
-    @Override
+   @Override
     public void run() {
-        
-    }
+    System.out.println("[Thread-" + Thread.currentThread().getName() + "] Menghitung Trapesium: " + toString());
+    hitungLuas(atas, bawah, tinggi);
+    hitungKeliling(atas, bawah, kiri, kanan);
+    System.out.println("[Thread-" + Thread.currentThread().getName() +
+            "] Selesai -> Luas=" + String.format("%.2f", luas) +
+            ", Keliling=" + String.format("%.2f", keliling));
+}
 }

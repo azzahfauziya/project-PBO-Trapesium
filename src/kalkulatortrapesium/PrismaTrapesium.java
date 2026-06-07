@@ -51,6 +51,15 @@ public class PrismaTrapesium extends Trapesium implements Geometri3D, Runnable {
 
     @Override
     public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    System.out.println("[Thread-" + Thread.currentThread().getName() + "] Menghitung Prisma: " + toString());
+    hitungLuas(atas, bawah, tinggi);
+    hitungKeliling(atas, bawah, kiri, kanan);
+    hitungVolume(atas, bawah, tinggi);
+    hitungLuasPermukaan(atas, bawah, kanan, kiri, tinggi);
+    System.out.println("[Thread-" + Thread.currentThread().getName() +
+            "] Selesai Prisma -> Luas=" + String.format("%.2f", luas) +
+            ", Keliling=" + String.format("%.2f", keliling) +
+            ", Volume=" + String.format("%.2f", volume) +
+            ", LP=" + String.format("%.2f", luasPermukaan));
+}
 }
