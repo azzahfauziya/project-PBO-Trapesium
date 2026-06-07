@@ -79,7 +79,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         logo.setOpaque(false);
         logo.setLayout(new BoxLayout(logo, BoxLayout.Y_AXIS));
         logo.setBorder(BorderFactory.createEmptyBorder(28, 20, 20, 20));
-        JLabel icon  = mkLabel("◇", 32, Font.BOLD, C_ACCENT);  icon.setAlignmentX(CENTER_ALIGNMENT);
+        JLabel icon  = mkLabel("", 32, Font.BOLD, C_ACCENT);  icon.setAlignmentX(CENTER_ALIGNMENT);
         JLabel title = mkLabel("TRAPESIUM", 13, Font.BOLD, C_TEXT); title.setAlignmentX(CENTER_ALIGNMENT);
         JLabel sub   = mkLabel("KALKULATOR", 10, Font.PLAIN, C_MUTED); sub.setAlignmentX(CENTER_ALIGNMENT);
         logo.add(icon); logo.add(Box.createVerticalStrut(6)); logo.add(title); logo.add(sub);
@@ -89,11 +89,11 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         nav.setOpaque(false);
         nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
         nav.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
-        nav.add(navBtn("⌂  Beranda",        "home",  C_ACCENT2));
+        nav.add(navBtn("  Beranda",        "home",  C_ACCENT2));
         nav.add(Box.createVerticalStrut(6));
-        nav.add(navBtn("✎  Input Manual",   "menu1", C_ACCENT));
+        nav.add(navBtn("  Input Manual",   "menu1", C_ACCENT));
         nav.add(Box.createVerticalStrut(6));
-        nav.add(navBtn("⟳  Multithreading", "menu2", C_ACCENT3));
+        nav.add(navBtn("  Multithreading", "menu2", C_ACCENT3));
         sb.add(nav, BorderLayout.CENTER);
 
         JLabel ver = mkLabel("v1.0 · Java Swing", 10, Font.ITALIC, C_MUTED);
@@ -152,8 +152,8 @@ public class KalkulatorTrapesiumGUI extends JFrame {
             box.add(Box.createVerticalStrut(36));
 
             for (String[] item : new String[][]{
-                {"✎", "Input Manual",   "Hitung Trapesium 2D, Prisma, atau Limas\ndengan memasukkan sisi secara manual.", "menu1"},
-                {"⟳", "Multithreading", "Generate data random, proses paralel\ndengan thread pool dan visualisasi.",      "menu2"}
+                {"", "Input Manual",   "Hitung Trapesium 2D, Prisma, atau Limas\ndengan memasukkan sisi secara manual.", "menu1"},
+                {"", "Multithreading", "Generate data random, proses paralel\ndengan thread pool dan visualisasi.",      "menu2"}
             }) {
                 JButton card = homeCard(item[0], item[1], item[2], item[3]);
                 card.setAlignmentX(CENTER_ALIGNMENT);
@@ -210,7 +210,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         Menu1Panel() {
             setBackground(C_BG);
             setLayout(new BorderLayout());
-            add(buildHeader("✎  Input Manual",
+            add(buildHeader("Input Manual",
                 "Masukkan panjang sisi untuk menghitung luas, keliling, volume, dan luas permukaan."),
                 BorderLayout.NORTH);
 
@@ -218,7 +218,36 @@ public class KalkulatorTrapesiumGUI extends JFrame {
             body.setBackground(C_BG);
             body.setBorder(BorderFactory.createEmptyBorder(14, 18, 14, 18));
 
-            JTabbedPane tabs = darkTabs();
+            JTabbedPane tabs = new JTabbedPane() {
+                @Override public void updateUI() {
+                    super.updateUI();
+                    setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
+                        @Override protected void paintTabBackground(Graphics g, int tabPlacement,
+                                int tabIndex, int x, int y, int w, int h, boolean isSelected) {
+                            Graphics2D g2 = (Graphics2D) g;
+                            Color bg = isSelected ? new Color(28, 36, 64) : new Color(14, 18, 34);
+                            g2.setColor(bg);
+                            g2.fillRect(x, y, w, h);
+                        }
+                        @Override protected void paintTabBorder(Graphics g, int tabPlacement,
+                                int tabIndex, int x, int y, int w, int h, boolean isSelected) {
+                            g.setColor(isSelected ? C_ACCENT2 : C_BORDER);
+                            g.drawRect(x, y, w - 1, h - 1);
+                        }
+                        @Override protected void paintContentBorder(Graphics g, int tabPlacement, int selectedIndex) {
+                            g.setColor(C_BORDER);
+                            g.drawRect(tabAreaInsets.left, calculateTabAreaHeight(tabPlacement, runCount, maxTabHeight) + tabAreaInsets.top,
+                                    getWidth() - tabAreaInsets.left - tabAreaInsets.right - 1,
+                                    getHeight() - calculateTabAreaHeight(tabPlacement, runCount, maxTabHeight) - tabAreaInsets.top - tabAreaInsets.bottom - 1);
+                        }
+                        @Override protected void paintFocusIndicator(Graphics g, int tabPlacement, Rectangle[] rects, int tabIndex, Rectangle iconRect, Rectangle textRect, boolean isSelected) {}
+                    });
+                    setBackground(new Color(14, 18, 34));
+                    setForeground(C_TEXT);
+                    setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                }
+            };
+            tabs.setOpaque(true);
             tabs.addTab("Trapesium 2D", inputForm2D());
             tabs.addTab("Prisma",        inputFormPrisma());
             tabs.addTab("Limas",         inputFormLimas());
@@ -256,7 +285,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
 
         JPanel inputFormPrisma() {
             JPanel p = formPanel();
-            String[] lbl = {"Sisi Atas","Sisi Bawah","Tinggi Alas","Sisi Kiri","Sisi Kanan","Panjang Prisma"};
+            String[] lbl = {"Sisi Atas","Sisi Bawah","Tinggi Alas","Sisi Kiri","Sisi Kanan","Tinggi Prisma"};
             for (int i = 0; i < 6; i++) { fPr[i] = field(); addRow(p, lbl[i], fPr[i]); }
             JButton btn = actionBtn("Hitung Prisma", C_ACCENT);
             btn.addActionListener(e -> hitungPrisma());
@@ -306,13 +335,13 @@ public class KalkulatorTrapesiumGUI extends JFrame {
                 result.setText(
                     "══ PRISMA TRAPESIUM ══════════════════\n\n"+
                     "  Input:\n    Atas="+a+" Bawah="+b+" Tinggi="+t+
-                    "\n    Kiri="+ki+" Kanan="+ka+" Panjang="+p+"\n\n"+
+                    "\n    Kiri="+ki+" Kanan="+ka+" Tinggi Prisma="+p+"\n\n"+
                     "  ── Luas Alas ────────────────────────\n"+
                     String.format("  L  = ½×(%.2f+%.2f)×%.2f = %.2f\n\n",a,b,t,L)+
                     "  ── Keliling Alas ────────────────────\n"+
                     String.format("  K  = %.2f\n\n",K)+
                     "  ── Volume ───────────────────────────\n"+
-                    "  V  = Luas Alas × Panjang\n"+
+                    "  V  = Luas Alas × Tinggi Prisma\n"+
                     String.format("     = %.2f × %.2f = %.2f\n\n",L,p,V)+
                     "  ── Luas Permukaan ───────────────────\n"+
                     "  LP = (2×L) + (a+b+ki+ka)×panjang\n"+
@@ -377,7 +406,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
         Menu2Panel() {
             setBackground(C_BG);
             setLayout(new BorderLayout());
-            add(buildHeader("⟳  Multithreading",
+            add(buildHeader("Multithreading",
                 "Generate data random, proses paralel dengan thread pool, visualisasi real-time."),
                 BorderLayout.NORTH);
 
@@ -410,7 +439,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
             // Panel log
             JPanel logPanel = new JPanel(new BorderLayout(0, 4));
             logPanel.setBackground(C_BG);
-            logPanel.add(mkLabel("  🧵 Thread Log", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
+            logPanel.add(mkLabel("  Thread Log", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
             logArea = new JTextArea();
             logArea.setEditable(false);
             logArea.setBackground(new Color(8, 10, 20));
@@ -427,7 +456,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
             // ── Bagian bawah: tabel hasil
             JPanel tablePanel = new JPanel(new BorderLayout(0, 4));
             tablePanel.setBackground(C_BG);
-            tablePanel.add(mkLabel("  📋 Tabel Hasil Perhitungan", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
+            tablePanel.add(mkLabel("  Tabel Hasil Perhitungan", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
 
             tableModel = new DefaultTableModel(COLS, 0) {
                 @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -477,11 +506,11 @@ public class KalkulatorTrapesiumGUI extends JFrame {
             ed.getTextField().setFont(new Font("Consolas", Font.PLAIN, 13));
             bar.add(spinner);
 
-            runBtn = actionBtn("▶  Jalankan", C_ACCENT);
+            runBtn = actionBtn("Jalankan", C_ACCENT);
             runBtn.addActionListener(e -> jalankan());
             bar.add(runBtn);
 
-            JButton clrBtn = actionBtn("✕  Bersihkan", new Color(80, 40, 40));
+            JButton clrBtn = actionBtn("Bersihkan", new Color(80, 40, 40));
             clrBtn.addActionListener(e -> {
                 visualPanel.clear();
                 logArea.setText("");
@@ -491,7 +520,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
             });
             bar.add(clrBtn);
 
-            bar.add(mkLabel("  ⚠ Thread pool: 4 thread paralel", 11, Font.ITALIC, C_MUTED));
+            bar.add(mkLabel("  Thread pool: 4 thread paralel", 11, Font.ITALIC, C_MUTED));
             return bar;
         }
 
@@ -777,7 +806,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
             Graphics2D g2 = (Graphics2D) g;
             g2.setColor(new Color(50, 60, 90));
             g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-            String msg = "Tekan ▶ Jalankan untuk memulai simulasi thread";
+            String msg = "Tekan Jalankan untuk memulai simulasi thread";
             FontMetrics fm = g2.getFontMetrics();
             g2.drawString(msg, (getWidth() - fm.stringWidth(msg)) / 2, getHeight() / 2);
         }
