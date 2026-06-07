@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class KalkulatorTrapesiumGUI extends JFrame {
+public class Main extends JFrame {
 
     static final Color C_BG      = new Color(10, 12, 22);
     static final Color C_PANEL   = new Color(18, 22, 40);
@@ -32,7 +32,7 @@ public class KalkulatorTrapesiumGUI extends JFrame {
     private JPanel     cardContainer;
     private CardLayout cardLayout;
 
-    public KalkulatorTrapesiumGUI() {
+    public Main() {
         setTitle("Kalkulator Trapesium");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1100, 720);
@@ -1028,6 +1028,6 @@ public class KalkulatorTrapesiumGUI extends JFrame {
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
         catch (Exception ignored) {}
-        SwingUtilities.invokeLater(KalkulatorTrapesiumGUI::new);
+        SwingUtilities.invokeLater(Main::new);
     }
 }
