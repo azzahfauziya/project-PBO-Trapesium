@@ -663,7 +663,7 @@ public class Main extends JFrame {
 
                         // log — batasi supaya tidak lag di data besar
                         if (d <= LOG_LIMIT) {
-                            appendLog("[" + shortTn + "] ✔ #" + idx + " " + fJenis
+                            appendLog("[" + shortTn + "]  #" + idx + " " + fJenis
                                 + " L=" + String.format("%.2f", fLuas)
                                 + " | " + elapsed + "ms");
                         } else if (d == LOG_LIMIT + 1) {
@@ -906,16 +906,13 @@ public class Main extends JFrame {
                         (int)(255 * alpha)));
                     g2.fillOval(x + w/2 - 10 + d*7, y + h - 14, 5, 5);
                 }
-                // trigger repaint animasi
-//                Timer t = new Timer(150, ev -> repaint());
-//                t.setRepeats(false); t.start();
             }
 
             if (done) {
                 g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 g2.setColor(C_SUCCESS);
                 FontMetrics fm3 = g2.getFontMetrics();
-                g2.drawString("✔", x + (w - fm3.stringWidth("✔")) / 2, y + 52);
+                g2.drawString(" ", x + (w - fm3.stringWidth(" ")) / 2, y + 52);
                 g2.setFont(new Font("Segoe UI", Font.PLAIN, 8));
                 g2.setColor(new Color(90, 120, 160));
                 String msStr = card.ms + "ms";
