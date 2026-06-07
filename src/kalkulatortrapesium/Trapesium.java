@@ -64,4 +64,9 @@ public class Trapesium implements Geometri2D, Runnable{
         
         return keliling;
     }
+
+    @Override
+    public void run() {
+        
+    }
 }

@@ -48,4 +48,9 @@ public class PrismaTrapesium extends Trapesium implements Geometri3D, Runnable {
                       + (kanan  * tinggiPrisma);
         return luasPermukaan;
     }
+
+    @Override
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

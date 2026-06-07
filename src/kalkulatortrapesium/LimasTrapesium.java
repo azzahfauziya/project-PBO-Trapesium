@@ -1,17 +1,17 @@
 package kalkulatortrapesium;
 
-/**
- * Kelas LimasTrapesium - bangun ruang limas beralas trapesium
- *
- * ✅ PEWARISAN    - mewarisi Trapesium (mendapat hitungLuas & hitungKeliling)
- * ✅ POLIMORFISME - override hitungVolume dan hitungLuasPermukaan
- * ✅ MULTITHREADING - setiap perhitungan dijalankan di thread terpisah
- */
 public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
-
-    public double tinggiLimas;       // tinggi limas dari alas ke puncak
     public double volume;
     public double luasPermukaan;
+    private double tinggiLimas;
+    
+    public void setTinggiLimas(double tinggiLimas){
+        this.tinggiLimas = tinggiLimas;
+    }
+    
+    public double getTinggiLimas(){
+        return tinggiLimas;
+    }
 
     // ✅ OVERLOADING - konstruktor kosong (tanpa parameter)
     public LimasTrapesium() {
@@ -66,5 +66,10 @@ public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
                       + (0.5 * kiri      * apotemaKiriKanan)
                       + (0.5 * kanan     * apotemaKiriKanan);
         return luasPermukaan;
+    }
+
+    @Override
+    public void run() {
+    
     }
 }
