@@ -18,10 +18,13 @@ public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
         this.tinggiLimas = 0;
     }
 
-    // OVERLOADING - konstruktor dengan parameter lengkap
+     // OVERLOADING - konstruktor dengan parameter lengkap
     public LimasTrapesium(double atas, double bawah, double tinggi,
                           double kiri, double kanan, double tinggiLimas) {
         super(atas, bawah, tinggi, kiri, kanan);
+        if (tinggiLimas <= 0) {
+            throw new IllegalArgumentException("Tinggi limas harus bernilai lebih besar dari 0.");
+        }
         this.tinggiLimas = tinggiLimas;
     }
 

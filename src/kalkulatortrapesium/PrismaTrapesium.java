@@ -16,6 +16,9 @@ public class PrismaTrapesium extends Trapesium implements Geometri3D, Runnable {
     public PrismaTrapesium(double atas, double bawah, double tinggi,
                            double kiri, double kanan, double panjang) {
         super(atas, bawah, tinggi, kiri, kanan); // panggil konstruktor Trapesium berparameter
+        if (panjang <= 0) {
+            throw new IllegalArgumentException("Tinggi prisma harus bernilai lebih besar dari 0.");
+        }
         this.tinggiPrisma = panjang;
     }
 

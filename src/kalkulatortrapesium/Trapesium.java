@@ -1,13 +1,5 @@
 package kalkulatortrapesium;
 
-/**
- * Kelas abstrak Trapesium yang mengimplementasikan Geometri2D
- *
- * ✅ ABSTRAKSI    - kelas ini abstract, tidak bisa diinstansiasi langsung
- * ✅ ENKAPSULASI  - atribut bersifat private, diakses lewat getter/setter
- * ✅ PEWARISAN    - diwarisi oleh PrismaTrapesium dan LimasTrapesium
- * ✅ MULTITHREADING - perhitungan dilakukan di thread terpisah
- */
 public class Trapesium implements Geometri2D, Runnable{
 
 
@@ -30,11 +22,19 @@ public class Trapesium implements Geometri2D, Runnable{
 
     // OVERLOADING - konstruktor dengan parameter lengkap
     public Trapesium(double atas, double bawah, double tinggi, double kiri, double kanan) {
+        validasi(atas, bawah, tinggi, kiri, kanan);
         this.atas   = atas;
         this.bawah  = bawah;
         this.tinggi = tinggi;
         this.kiri   = kiri;
         this.kanan  = kanan;
+    }
+
+    // VALIDASI - dipanggil oleh constructor Trapesium dan subclass-nya
+    protected void validasi(double atas, double bawah, double tinggi, double kiri, double kanan) {
+        if (atas <= 0 || bawah <= 0 || tinggi <= 0 || kiri <= 0 || kanan <= 0) {
+            throw new IllegalArgumentException("Semua sisi dan tinggi harus bernilai lebih besar dari 0.");
+        }
     }
 
     @Override
@@ -49,19 +49,13 @@ public class Trapesium implements Geometri2D, Runnable{
     }
 
     @Override
-    public double hitungKeliling() {
-        double jumlahAtasBawah = atas + bawah;   // sisi sejajar atas dan bawah
-        double jumlahKiriKanan = kiri + kanan;   // sisi miring kiri dan kanan
-        keliling = jumlahAtasBawah + jumlahKiriKanan; // total semua sisi
-        
+    public double hitungKeliling() {  // sisi miring kiri dan kanan
+        keliling = atas + bawah + kanan + kiri; // total semua sisi
         return keliling;
     }
     
     public double hitungKeliling(double atas, double bawah, double kiri, double kanan) {
-        double jumlahAtasBawah = atas + bawah;   // sisi sejajar atas dan bawah
-        double jumlahKiriKanan = kiri + kanan;   // sisi miring kiri dan kanan
-        keliling = jumlahAtasBawah + jumlahKiriKanan; // total semua sisi
-        
+        keliling = atas + bawah + kanan + kiri; // total semua sisi
         return keliling;
     }
 
