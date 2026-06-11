@@ -6,13 +6,13 @@ public class PrismaTrapesium extends Trapesium implements Geometri3D, Runnable {
     public double volume;
     public double luasPermukaan;
 
-    // ✅ OVERLOADING - konstruktor kosong (tanpa parameter)
+    // OVERLOADING - konstruktor kosong (tanpa parameter)
     public PrismaTrapesium() {
         super(); // panggil konstruktor Trapesium kosong
         this.tinggiPrisma = 0;
     }
 
-    // ✅ OVERLOADING - konstruktor dengan parameter lengkap
+    // OVERLOADING - konstruktor dengan parameter lengkap
     public PrismaTrapesium(double atas, double bawah, double tinggi,
                            double kiri, double kanan, double panjang) {
         super(atas, bawah, tinggi, kiri, kanan); // panggil konstruktor Trapesium berparameter

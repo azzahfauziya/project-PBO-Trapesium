@@ -10,7 +10,7 @@ package kalkulatortrapesium;
  */
 public class Trapesium implements Geometri2D, Runnable{
 
-    // ✅ ENKAPSULASI - semua atribut private
+
     public double atas;     // panjang sisi atas trapesium
     public double bawah;    // panjang sisi bawah trapesium
     public double tinggi;   // tinggi trapesium
@@ -19,7 +19,7 @@ public class Trapesium implements Geometri2D, Runnable{
     public double luas;
     public double keliling;
 
-    // ✅ OVERLOADING - konstruktor tanpa parameter (kosong)
+    // OVERLOADING - konstruktor tanpa parameter (kosong)
     public Trapesium() {
         this.atas    = 0;
         this.bawah   = 0;
@@ -28,7 +28,7 @@ public class Trapesium implements Geometri2D, Runnable{
         this.kanan   = 0;
     }
 
-    // ✅ OVERLOADING - konstruktor dengan parameter lengkap
+    // OVERLOADING - konstruktor dengan parameter lengkap
     public Trapesium(double atas, double bawah, double tinggi, double kiri, double kanan) {
         this.atas   = atas;
         this.bawah  = bawah;

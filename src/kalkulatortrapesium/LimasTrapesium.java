@@ -4,9 +4,15 @@ public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
 
     public double volume;
     public double luasPermukaan;
-    public double tinggiLimas;   // diubah dari private ke public, hapus setter/getter
+    public double tinggiLimas;   
 
-    // OVERLOADING - konstruktor kosong
+    public double proyeksiAtasBawah;
+    public double proyeksiKiriKanan;
+    
+    private double apotemaAtasBawah;
+    private double apotemaKiriKanan;
+
+    // OVERLOADING 
     public LimasTrapesium() {
         super();
         this.tinggiLimas = 0;
@@ -32,12 +38,14 @@ public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
 
     @Override
     public double hitungLuasPermukaan() {
-        double proyeksiAtasBawah = (bawah - atas) / 2.0;
-        double proyeksiKiriKanan = tinggi / 2.0;
-        double apotemaAtasBawah  = Math.sqrt((tinggiLimas * tinggiLimas)
+        this.proyeksiAtasBawah = (bawah - atas) / 2.0;
+        this.proyeksiKiriKanan = tinggi / 2.0;
+        
+        this.apotemaAtasBawah = Math.sqrt((tinggiLimas * tinggiLimas)
                                            + (proyeksiAtasBawah * proyeksiAtasBawah));
-        double apotemaKiriKanan  = Math.sqrt((tinggiLimas * tinggiLimas)
+        this.apotemaKiriKanan = Math.sqrt((tinggiLimas * tinggiLimas)
                                            + (proyeksiKiriKanan * proyeksiKiriKanan));
+        
         luasPermukaan = luas
                       + (0.5 * atas   * apotemaAtasBawah)
                       + (0.5 * bawah  * apotemaAtasBawah)
@@ -47,18 +55,28 @@ public class LimasTrapesium extends Trapesium implements Geometri3D, Runnable {
     }
 
     public double hitungLuasPermukaan(double atas, double bawah, double tinggi, double kiri, double kanan) {
-        double proyeksiAtasBawah = (bawah - atas) / 2.0;
-        double proyeksiKiriKanan = tinggi / 2.0;
-        double apotemaAtasBawah  = Math.sqrt((tinggiLimas * tinggiLimas)
+        this.proyeksiAtasBawah = (bawah - atas) / 2.0;
+        this.proyeksiKiriKanan = tinggi / 2.0;
+        
+        this.apotemaAtasBawah = Math.sqrt((tinggiLimas * tinggiLimas)
                                            + (proyeksiAtasBawah * proyeksiAtasBawah));
-        double apotemaKiriKanan  = Math.sqrt((tinggiLimas * tinggiLimas)
+        this.apotemaKiriKanan = Math.sqrt((tinggiLimas * tinggiLimas)
                                            + (proyeksiKiriKanan * proyeksiKiriKanan));
+        
         luasPermukaan = luas
                       + (0.5 * atas   * apotemaAtasBawah)
                       + (0.5 * bawah  * apotemaAtasBawah)
                       + (0.5 * kiri   * apotemaKiriKanan)
                       + (0.5 * kanan  * apotemaKiriKanan);
         return luasPermukaan;
+    }
+
+    public double getApotemaAtasBawah() {
+        return this.apotemaAtasBawah;
+    }
+
+    public double getApotemaKiriKanan() {
+        return this.apotemaKiriKanan;
     }
 
     @Override
