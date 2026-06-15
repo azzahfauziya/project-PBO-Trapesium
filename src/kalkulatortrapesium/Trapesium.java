@@ -22,19 +22,17 @@ public class Trapesium implements Geometri2D, Runnable{
 
     // OVERLOADING - konstruktor dengan parameter lengkap
     public Trapesium(double atas, double bawah, double tinggi, double kiri, double kanan) {
-        validasi(atas, bawah, tinggi, kiri, kanan);
+        if (atas <= 0 || bawah <= 0 || tinggi <= 0 || kiri <= 0 || kanan <= 0) {
+            throw new IllegalArgumentException("Semua sisi dan tinggi harus bernilai lebih besar dari 0.");
+        } else if (atas == bawah) {
+            throw new IllegalArgumentException("Panjang sisi atas dan bawah tidak boleh sama");
+        }
+        
         this.atas   = atas;
         this.bawah  = bawah;
         this.tinggi = tinggi;
         this.kiri   = kiri;
         this.kanan  = kanan;
-    }
-
-    // VALIDASI - dipanggil oleh constructor Trapesium dan subclass-nya
-    protected void validasi(double atas, double bawah, double tinggi, double kiri, double kanan) {
-        if (atas <= 0 || bawah <= 0 || tinggi <= 0 || kiri <= 0 || kanan <= 0) {
-            throw new IllegalArgumentException("Semua sisi dan tinggi harus bernilai lebih besar dari 0.");
-        }
     }
 
     @Override

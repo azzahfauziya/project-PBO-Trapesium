@@ -7,7 +7,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends JFrame {
@@ -201,12 +202,10 @@ public class Main extends JFrame {
     //  MENU 1 — INPUT MANUAL
     // ══════════════════════════════════════════════════════════════
     class Menu1Panel extends JPanel {
-        // ── INPUT: field-field input untuk masing-masing bentuk ──
         JTextField[] f2D = new JTextField[5];
         JTextField[] fPr = new JTextField[6];
         JTextField[] fLi = new JTextField[6];
 
-        // ── OUTPUT: area teks untuk menampilkan hasil perhitungan ──
         JTextArea result;
         JLabel    resultTitle;
 
@@ -262,7 +261,6 @@ public class Main extends JFrame {
             resultTitle = mkLabel("Hasil Perhitungan", 13, Font.BOLD, C_ACCENT2);
             right.add(resultTitle, BorderLayout.NORTH);
 
-            // ── OUTPUT: JTextArea "result" menampilkan rincian hasil ──
             result = new JTextArea("Pilih jenis bangun dan tekan Hitung...");
             result.setEditable(false);
             result.setBackground(C_PANEL);
@@ -277,7 +275,6 @@ public class Main extends JFrame {
             add(body, BorderLayout.CENTER);
         }
 
-        // ── INPUT: form Trapesium 2D (5 field) ──
         JPanel inputForm2D() {
             JPanel p = formPanel();
             String[] lbl = {"Sisi Atas","Sisi Bawah","Tinggi","Sisi Kiri","Sisi Kanan"};
@@ -288,7 +285,6 @@ public class Main extends JFrame {
             return wrap(p);
         }
 
-        // ── INPUT: form Prisma (6 field) ──
         JPanel inputFormPrisma() {
             JPanel p = formPanel();
             String[] lbl = {"Sisi Atas","Sisi Bawah","Tinggi Alas","Sisi Kiri","Sisi Kanan","Tinggi Prisma"};
@@ -299,7 +295,6 @@ public class Main extends JFrame {
             return wrap(p);
         }
 
-        // ── INPUT: form Limas (6 field) ──
         JPanel inputFormLimas() {
             JPanel p = formPanel();
             String[] lbl = {"Sisi Atas","Sisi Bawah","Tinggi Alas","Sisi Kiri","Sisi Kanan","Tinggi Limas"};
@@ -314,17 +309,12 @@ public class Main extends JFrame {
         // HITUNG TRAPESIUM 2D
         // ══════════════════════════════════════════════════════
         void hitung2D() {
+            // EXCEPTION: NumberFormatException jika input bukan angka (ditangkap di dbl())
             try {
-                // ── INPUT: ambil & validasi nilai dari field (dbl() bisa lempar exception) ──
                 double atas=dbl(f2D[0]),bawah=dbl(f2D[1]),tinggi=dbl(f2D[2]),kiri=dbl(f2D[3]),kanan=dbl(f2D[4]);
-
-                // ── pembuatan objek; constructor bisa lempar IllegalArgumentException
-                //    jika nilai tidak valid (mis. <= 0) — EXCEPTION ditangani di catch bawah ──
+                // EXCEPTION: IllegalArgumentException dari constructor Trapesium jika nilai tidak valid
                 Trapesium t = new Trapesium(atas,bawah,tinggi,kiri,kanan);
-
                 double L=t.hitungLuas(), K=t.hitungKeliling();
-
-                // ── OUTPUT: tampilkan hasil ke JTextArea "result" ──
                 resultTitle.setText("Hasil — Trapesium 2D");
                 result.setText(
                     "══ TRAPESIUM 2D ══════════════════════\n\n" +
@@ -339,9 +329,11 @@ public class Main extends JFrame {
                     "  K = atas + bawah + kiri + kanan\n"+
                     String.format("    = %.2f + %.2f + %.2f + %.2f\n",atas,bawah,kiri,kanan)+
                     String.format("    = %.2f\n",K));
-            } catch(Exception ex){
-                // ── EXCEPTION: input bukan angka (NumberFormatException dari dbl())
-                //    atau nilai tidak valid (IllegalArgumentException dari constructor Trapesium) ──
+            } catch (NumberFormatException ex) {
+                // EXCEPTION: input bukan angka — tampilkan warning sederhana
+                showErr("Input harus berupa angka.");
+            } catch (IllegalArgumentException ex) {
+                // EXCEPTION: nilai tidak valid dari constructor Trapesium
                 showErr(ex.getMessage());
             }
         }
@@ -350,18 +342,13 @@ public class Main extends JFrame {
         // HITUNG PRISMA
         // ══════════════════════════════════════════════════════
         void hitungPrisma() {
+            // EXCEPTION: NumberFormatException jika input bukan angka (ditangkap di dbl())
             try {
-                // ── INPUT: ambil & validasi nilai dari field ──
                 double a=dbl(fPr[0]),b=dbl(fPr[1]),t=dbl(fPr[2]),ki=dbl(fPr[3]),ka=dbl(fPr[4]),p=dbl(fPr[5]);
-
-                // ── pembuatan objek; constructor PrismaTrapesium bisa lempar
-                //    IllegalArgumentException — EXCEPTION ditangani di catch bawah ──
+                // EXCEPTION: IllegalArgumentException dari constructor PrismaTrapesium jika nilai tidak valid
                 PrismaTrapesium pr = new PrismaTrapesium(a,b,t,ki,ka,p);
-
                 double L=pr.hitungLuas(a,b,t), K=pr.hitungKeliling(a,b,ki,ka);
                 double V=pr.hitungVolume(a,b,t), LP=pr.hitungLuasPermukaan(a,b,ka,ki,t);
-
-                // ── OUTPUT: tampilkan hasil ke JTextArea "result" ──
                 resultTitle.setText("Hasil — Prisma Trapesium");
                 result.setText(
                     "══ PRISMA TRAPESIUM ══════════════════\n\n"+
@@ -378,8 +365,11 @@ public class Main extends JFrame {
                     "  LP = (2×L) + (a+b+ki+ka)×panjang\n"+
                     String.format("     = (2×%.2f)+(%.2f+%.2f+%.2f+%.2f)×%.2f\n",L,a,b,ki,ka,p)+
                     String.format("     = %.2f\n",LP));
-            } catch(Exception ex){
-                // ── EXCEPTION: input bukan angka atau nilai tidak valid ──
+            } catch (NumberFormatException ex) {
+                // EXCEPTION: input bukan angka — tampilkan warning sederhana
+                showErr("Input harus berupa angka.");
+            } catch (IllegalArgumentException ex) {
+                // EXCEPTION: nilai tidak valid dari constructor PrismaTrapesium
                 showErr(ex.getMessage());
             }
         }
@@ -388,20 +378,15 @@ public class Main extends JFrame {
         // HITUNG LIMAS
         // ══════════════════════════════════════════════════════
         void hitungLimas() {
+            // EXCEPTION: NumberFormatException jika input bukan angka (ditangkap di dbl())
             try {
-                // ── INPUT: ambil & validasi nilai dari field ──
                 double a=dbl(fLi[0]),b=dbl(fLi[1]),t=dbl(fLi[2]),ki=dbl(fLi[3]),ka=dbl(fLi[4]),tl=dbl(fLi[5]);
-
-                // ── pembuatan objek; constructor LimasTrapesium bisa lempar
-                //    IllegalArgumentException — EXCEPTION ditangani di catch bawah ──
+                // EXCEPTION: IllegalArgumentException dari constructor LimasTrapesium jika nilai tidak valid
                 LimasTrapesium li = new LimasTrapesium(a,b,t,ki,ka,tl);
-
                 double L=li.hitungLuas(a,b,t), K=li.hitungKeliling(a,b,ki,ka);
                 double V=li.hitungVolume(a,b,t), LP=li.hitungLuasPermukaan(a,b,t,ki,ka);
                 double pAB=(b-a)/2.0, pKK=t/2.0;
                 double apAB=Math.sqrt(tl*tl+pAB*pAB), apKK=Math.sqrt(tl*tl+pKK*pKK);
-
-                // ── OUTPUT: tampilkan hasil ke JTextArea "result" ──
                 resultTitle.setText("Hasil — Limas Trapesium");
                 result.setText(
                     "══ LIMAS TRAPESIUM ═══════════════════\n\n"+
@@ -418,35 +403,24 @@ public class Main extends JFrame {
                     String.format("  V  = ⅓ × %.2f × %.2f = %.2f\n\n",L,tl,V)+
                     "  ── Luas Permukaan ───────────────────\n"+
                     String.format("  LP = %.2f\n",LP));
-            } catch(Exception ex){
-                // ── EXCEPTION: input bukan angka atau nilai tidak valid ──
+            } catch (NumberFormatException ex) {
+                // EXCEPTION: input bukan angka — tampilkan warning sederhana
+                showErr("Input harus berupa angka.");
+            } catch (IllegalArgumentException ex) {
+                // EXCEPTION: nilai tidak valid dari constructor LimasTrapesium
                 showErr(ex.getMessage());
             }
         }
 
-        // ── OUTPUT (kasus error): tampilkan pesan exception ke user ──
         void showErr(String msg) {
             resultTitle.setText("⚠ Input Tidak Valid");
-            result.setText("Pastikan semua field diisi dengan angka.\n\nDetail: " + msg);
+            result.setText("Detail: " + msg);
         }
 
-        // ══════════════════════════════════════════════════════
         // EXCEPTION: parsing input teks -> double.
-        // - Melempar IllegalArgumentException("Field tidak boleh kosong.")
-        //   jika field kosong.
-        // - Melempar IllegalArgumentException("Nilai ... bukan angka yang valid.")
-        //   jika teks bukan format angka (menangkap NumberFormatException).
-        // ══════════════════════════════════════════════════════
+        // Melempar NumberFormatException jika teks bukan angka.
         double dbl(JTextField tf) {
-            String txt = tf.getText().trim();
-            if (txt.isEmpty()) {
-                throw new IllegalArgumentException("Field tidak boleh kosong.");
-            }
-            try {
-                return Double.parseDouble(txt);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Nilai \"" + txt + "\" bukan angka yang valid.");
-            }
+            return Double.parseDouble(tf.getText().trim());
         }
     }
 
@@ -455,20 +429,14 @@ public class Main extends JFrame {
     // ══════════════════════════════════════════════════════════════
     class Menu2Panel extends JPanel {
 
-        // ── INPUT: jumlah data yang akan digenerate & diproses ──
         JSpinner          spinner;
         JButton           runBtn;
         JLabel            statusLabel;
         JProgressBar      progressBar;
         ThreadVisualPanel visualPanel;
-
-        // ── OUTPUT: log proses tiap thread ──
         JTextArea         logArea;
-
-        // ── OUTPUT: tabel hasil perhitungan semua data ──
         DefaultTableModel tableModel;
 
-        // kolom tabel hasil
         static final String[] COLS = {
             "#", "Jenis", "Atas", "Bawah", "Tinggi", "Kiri", "Kanan", "Extra",
             "Luas", "Keliling", "Volume", "Luas Permukaan", "Thread", "ms"
@@ -486,28 +454,24 @@ public class Main extends JFrame {
             body.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
             body.add(buildControlBar(), BorderLayout.NORTH);
 
-            // Split utama: atas = visual+log, bawah = tabel
             JSplitPane mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
             mainSplit.setBackground(C_BG);
             mainSplit.setDividerSize(7);
             mainSplit.setResizeWeight(0.45);
             mainSplit.setBorder(null);
 
-            // ── Bagian atas: visual thread + log (split horizontal)
             JSplitPane topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
             topSplit.setBackground(C_BG);
             topSplit.setDividerSize(5);
             topSplit.setResizeWeight(0.65);
             topSplit.setBorder(null);
 
-            // Panel visual thread
             visualPanel = new ThreadVisualPanel();
             JScrollPane vsp = new JScrollPane(visualPanel);
             vsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
             vsp.getViewport().setBackground(new Color(14, 18, 34));
             topSplit.setTopComponent(vsp);
 
-            // Panel log
             JPanel logPanel = new JPanel(new BorderLayout(0, 4));
             logPanel.setBackground(C_BG);
             logPanel.add(mkLabel("  Thread Log", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
@@ -524,7 +488,6 @@ public class Main extends JFrame {
 
             mainSplit.setTopComponent(topSplit);
 
-            // ── Bagian bawah: tabel hasil
             JPanel tablePanel = new JPanel(new BorderLayout(0, 4));
             tablePanel.setBackground(C_BG);
             tablePanel.add(mkLabel("  Tabel Hasil Perhitungan", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
@@ -542,7 +505,6 @@ public class Main extends JFrame {
 
             body.add(mainSplit, BorderLayout.CENTER);
 
-            // Progress bar — bagian dari OUTPUT (status proses)
             JPanel progRow = new JPanel(new BorderLayout(8, 0));
             progRow.setBackground(C_BG);
             progRow.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
@@ -567,7 +529,6 @@ public class Main extends JFrame {
 
             bar.add(mkLabel("Jumlah Data:", 13, Font.PLAIN, C_TEXT));
 
-            // ── INPUT: spinner jumlah data (tidak ada batas maksimal) ──
             spinner = new JSpinner(new SpinnerNumberModel(6, 1, Integer.MAX_VALUE, 1));
             spinner.setPreferredSize(new Dimension(90, 30));
             JSpinner.NumberEditor ed = new JSpinner.NumberEditor(spinner, "#");
@@ -577,9 +538,9 @@ public class Main extends JFrame {
             ed.getTextField().setFont(new Font("Consolas", Font.PLAIN, 13));
             bar.add(spinner);
 
-            // ── INPUT (trigger): tombol "Jalankan" memulai proses multithreading ──
+            // START MULTITHREADING: tombol memanggil startMultithreading()
             runBtn = actionBtn("Jalankan", C_ACCENT);
-            runBtn.addActionListener(e -> jalankan());
+            runBtn.addActionListener(e -> startMultithreading());
             bar.add(runBtn);
 
             JButton clrBtn = actionBtn("Bersihkan", new Color(80, 40, 40));
@@ -614,12 +575,10 @@ public class Main extends JFrame {
             hdr.setFont(new Font("Segoe UI", Font.BOLD, 11));
             hdr.setReorderingAllowed(false);
 
-            // lebar kolom
             int[] w = {36, 90, 52, 52, 52, 52, 52, 60, 72, 76, 86, 106, 150, 52};
             for (int i = 0; i < w.length && i < t.getColumnCount(); i++)
                 t.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
 
-            // alternating row color
             t.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
                 @Override public Component getTableCellRendererComponent(
                         JTable tbl, Object val, boolean sel, boolean foc, int row, int col) {
@@ -638,10 +597,9 @@ public class Main extends JFrame {
         }
 
         // ══════════════════════════════════════════════════════
-        // JALANKAN — proses utama multithreading
+        // START MULTITHREADING: method utama menjalankan thread
         // ══════════════════════════════════════════════════════
-        void jalankan() {
-            // ── INPUT: ambil jumlah data dari spinner ──
+        void startMultithreading() {
             int n = (int) spinner.getValue();
 
             visualPanel.clear();
@@ -651,19 +609,17 @@ public class Main extends JFrame {
             statusLabel.setText("Memulai " + n + " job...");
             runBtn.setEnabled(false);
 
-            Random rng     = new Random();
-            int poolSize   = Math.min(n, 4);
+            Random rng    = new Random();
+            int poolSize  = Math.min(n, 4);
             visualPanel.initThreads(poolSize, n);
 
-            // ── START MULTITHREADING: membuat thread pool tetap (4 thread paralel) ──
-            ExecutorService pool   = Executors.newFixedThreadPool(poolSize);
-            AtomicInteger   done   = new AtomicInteger(0);
-            long[]          gStart = {System.currentTimeMillis()};
+            // START MULTITHREADING: buat thread pool tetap (maks 4 thread paralel)
+            ExecutorService pool = Executors.newFixedThreadPool(poolSize);
+            AtomicInteger done   = new AtomicInteger(0);
+            long[] gStart        = { System.currentTimeMillis() };
 
-            // Untuk data banyak, log hanya 500 baris terakhir supaya tidak lag
             final int LOG_LIMIT = 500;
 
-            // ── INPUT: generate data random untuk tiap job (data dummy untuk diproses thread) ──
             for (int i = 0; i < n; i++) {
                 final int    idx    = i + 1;
                 final int    type   = i % 3;
@@ -674,15 +630,12 @@ public class Main extends JFrame {
                 final double kanan  = Math.round((rng.nextDouble() * 5  + 2)    * 10.0) / 10.0;
                 final double extra  = Math.round((rng.nextDouble() * 8  + 3)    * 10.0) / 10.0;
 
-                // ── START MULTITHREADING: tiap job dikirim ke thread pool (pool.submit) ──
-                // Catatan: data digenerate dengan minimum +2/+3, sehingga selalu > 0
-                // dan tidak akan memicu IllegalArgumentException dari constructor.
+                // START MULTITHREADING: setiap job dikirim ke pool (maks 4 berjalan paralel)
                 pool.submit(() -> {
                     String tn   = Thread.currentThread().getName();
                     int    tIdx = threadIndex(tn, poolSize);
                     long   t0   = System.currentTimeMillis();
 
-                    // update visual hanya setiap 50 job untuk data banyak (performa)
                     boolean doVisual = (idx <= 200) || (idx % 50 == 0);
 
                     if (doVisual) {
@@ -692,26 +645,34 @@ public class Main extends JFrame {
                     String jenis;
                     double luas = 0, kel = 0, vol = Double.NaN, lp = Double.NaN;
 
-                    // ── proses perhitungan di dalam thread (paralel) ──
-                    if (type == 0) {
-                        jenis = "Trapesium 2D";
-                        Trapesium tt = new Trapesium(atas, bawah, tinggi, kiri, kanan);
-                        luas = tt.hitungLuas(atas, bawah, tinggi);
-                        kel  = tt.hitungKeliling(atas, bawah, kiri, kanan);
-                    } else if (type == 1) {
-                        jenis = "Prisma";
-                        PrismaTrapesium pr = new PrismaTrapesium(atas, bawah, tinggi, kiri, kanan, extra);
-                        luas = pr.hitungLuas(atas, bawah, tinggi);
-                        kel  = pr.hitungKeliling(atas, bawah, kiri, kanan);
-                        vol  = pr.hitungVolume(atas, bawah, tinggi);
-                        lp   = pr.hitungLuasPermukaan(atas, bawah, kanan, kiri, tinggi);
-                    } else {
-                        jenis = "Limas";
-                        LimasTrapesium li = new LimasTrapesium(atas, bawah, tinggi, kiri, kanan, extra);
-                        luas = li.hitungLuas(atas, bawah, tinggi);
-                        kel  = li.hitungKeliling(atas, bawah, kiri, kanan);
-                        vol  = li.hitungVolume(atas, bawah, tinggi);
-                        lp   = li.hitungLuasPermukaan(atas, bawah, tinggi, kiri, kanan);
+                    // EXCEPTION: IllegalArgumentException dari constructor masing-masing kelas
+                    try {
+                        if (type == 0) {
+                            jenis = "Trapesium 2D";
+                            Trapesium tt = new Trapesium(atas, bawah, tinggi, kiri, kanan);
+                            luas = tt.hitungLuas(atas, bawah, tinggi);
+                            kel  = tt.hitungKeliling(atas, bawah, kiri, kanan);
+                        } else if (type == 1) {
+                            jenis = "Prisma";
+                            PrismaTrapesium pr = new PrismaTrapesium(atas, bawah, tinggi, kiri, kanan, extra);
+                            luas = pr.hitungLuas(atas, bawah, tinggi);
+                            kel  = pr.hitungKeliling(atas, bawah, kiri, kanan);
+                            vol  = pr.hitungVolume(atas, bawah, tinggi);
+                            lp   = pr.hitungLuasPermukaan(atas, bawah, kanan, kiri, tinggi);
+                        } else {
+                            jenis = "Limas";
+                            LimasTrapesium li = new LimasTrapesium(atas, bawah, tinggi, kiri, kanan, extra);
+                            luas = li.hitungLuas(atas, bawah, tinggi);
+                            kel  = li.hitungKeliling(atas, bawah, kiri, kanan);
+                            vol  = li.hitungVolume(atas, bawah, tinggi);
+                            lp   = li.hitungLuasPermukaan(atas, bawah, tinggi, kiri, kanan);
+                        }
+                    } catch (IllegalArgumentException ex) {
+                        // EXCEPTION: nilai tidak valid dari constructor kelas bangun
+                        SwingUtilities.invokeLater(() ->
+                            appendLog("[ERROR] #" + idx + " " + ex.getMessage()));
+                        done.incrementAndGet();
+                        return;
                     }
 
                     long   elapsed = System.currentTimeMillis() - t0;
@@ -722,9 +683,7 @@ public class Main extends JFrame {
                     String lpStr   = Double.isNaN(lp)  ? "—" : String.format("%.2f", lp);
                     String shortTn = shortThread(tn);
 
-                    // ── OUTPUT: update UI (tabel, visual, log, progress) di Event Dispatch Thread ──
                     SwingUtilities.invokeLater(() -> {
-                        // OUTPUT — tabel: selalu tambahkan baris hasil
                         tableModel.addRow(new Object[]{
                             idx, fJenis,
                             String.format("%.1f", atas),
@@ -739,12 +698,10 @@ public class Main extends JFrame {
                             shortTn, elapsed + " ms"
                         });
 
-                        // OUTPUT — visual thread
                         if (doVisual) {
                             visualPanel.setJobDone(tIdx, idx, fJenis, fLuas, fKel, fVol, fLp, elapsed);
                         }
 
-                        // OUTPUT — log: batasi supaya tidak lag di data besar
                         if (d <= LOG_LIMIT) {
                             appendLog("[" + shortTn + "]  #" + idx + " " + fJenis
                                 + " L=" + String.format("%.2f", fLuas)
@@ -753,7 +710,6 @@ public class Main extends JFrame {
                             appendLog("... (log dibatasi " + LOG_LIMIT + " baris untuk performa) ...");
                         }
 
-                        // OUTPUT — progress bar
                         int pct = d * 100 / n;
                         progressBar.setValue(pct);
                         progressBar.setString(pct + "%  (" + d + "/" + n + ")");
@@ -767,10 +723,10 @@ public class Main extends JFrame {
                     });
                 });
             }
-            // ── selesai mengirim semua job; pool akan shutdown setelah semua job selesai ──
+            // START MULTITHREADING: pool shutdown setelah semua job selesai dikirim
             pool.shutdown();
         }
-
+        
         void appendLog(String msg) {
             logArea.append(msg + "\n");
             logArea.setCaretPosition(logArea.getDocument().getLength());
@@ -786,7 +742,7 @@ public class Main extends JFrame {
                 String[] p = tn.split("-");
                 return (Integer.parseInt(p[p.length - 1]) - 1) % poolSize;
             } catch (Exception e) {
-                // ── EXCEPTION: fallback jika nama thread tidak sesuai pola yang diharapkan ──
+                // EXCEPTION: fallback jika nama thread tidak sesuai pola
                 return 0;
             }
         }
@@ -807,20 +763,18 @@ public class Main extends JFrame {
         }
 
         static class ThreadRow {
-            int         tIdx;
-            String      name;
-            Color       color;
+            int           tIdx;
+            String        name;
+            Color         color;
             List<JobCard> cards = new ArrayList<>();
-            int         activeJob = -1;
-            // ringkasan untuk data besar
-            int         totalDone = 0;
-            long        totalMs   = 0;
+            int           activeJob = -1;
+            int           totalDone = 0;
+            long          totalMs   = 0;
             ThreadRow(int i, Color c) { tIdx=i; color=c; name="Thread-"+(i+1); }
         }
 
         List<ThreadRow> rows      = new ArrayList<>();
         int             totalJobs = 0;
-        // batas kartu yang ditampilkan per baris (performa)
         static final int MAX_CARDS_SHOWN = 80;
 
         ThreadVisualPanel() {
@@ -841,7 +795,6 @@ public class Main extends JFrame {
         void setJobActive(int tIdx, int jobIdx, int type) {
             if (tIdx >= rows.size()) return;
             ThreadRow row = rows.get(tIdx);
-            // hanya simpan kartu jika belum melebihi batas tampil
             if (row.cards.size() < MAX_CARDS_SHOWN) {
                 JobCard card = new JobCard(jobIdx, row.color);
                 card.jenis  = type == 0 ? "2D" : type == 1 ? "Prisma" : "Limas";
@@ -910,7 +863,6 @@ public class Main extends JFrame {
             g2.setColor(new Color(row.color.getRed(), row.color.getGreen(), row.color.getBlue(), 28));
             g2.fillRoundRect(10, y+2, lw-4, rowH-4, 8, 8);
 
-            // status dot
             boolean active = row.activeJob >= 0;
             g2.setColor(active ? row.color : row.color.darker());
             g2.fillOval(20, y + 14, 12, 12);
@@ -931,22 +883,19 @@ public class Main extends JFrame {
             if (row.totalDone > 0)
                 g2.drawString("Avg: " + (row.totalMs / row.totalDone) + "ms", 38, y + 59);
 
-            // apabila data sangat banyak, tampilkan info ringkas
             if (row.totalDone > MAX_CARDS_SHOWN) {
                 g2.setFont(new Font("Segoe UI", Font.ITALIC, 9));
                 g2.setColor(new Color(80, 100, 140));
                 g2.drawString("(tampil " + MAX_CARDS_SHOWN + " kartu)", 38, y + 70);
             }
 
-            // divider
             g2.setColor(new Color(35, 45, 80));
             g2.setStroke(new BasicStroke(1f));
             g2.drawLine(lw + 4, y + 8, lw + 4, y + rowH - 8);
 
-            // kartu job
             int cx = lw + 10;
             for (JobCard card : row.cards) {
-                if (cx + 108 > getWidth() - 10) break; // jangan keluar batas layar
+                if (cx + 108 > getWidth() - 10) break;
                 paintCard(g2, card, cx, y + 6, 105, rowH - 12);
                 cx += 110;
             }
@@ -966,7 +915,6 @@ public class Main extends JFrame {
             g2.setStroke(new BasicStroke(active ? 1.8f : 1f));
             g2.drawRoundRect(x, y, w, h, 8, 8);
 
-            // badge jenis
             Color badge = card.jenis.contains("2D")   ? C_ACCENT2 :
                           card.jenis.contains("Pris")  ? C_ACCENT  : C_ACCENT3;
             g2.setColor(badge);
@@ -977,7 +925,6 @@ public class Main extends JFrame {
             String bj = card.jenis.length() > 11 ? card.jenis.substring(0,9)+"…" : card.jenis;
             g2.drawString(bj, x + (w - fm.stringWidth(bj)) / 2, y + 12);
 
-            // nomor job
             g2.setFont(new Font("Segoe UI", Font.BOLD, 15));
             g2.setColor(active ? card.accent : done ? C_TEXT : new Color(70, 90, 130));
             String num = "#" + card.idx;
@@ -1037,7 +984,6 @@ public class Main extends JFrame {
         return h;
     }
 
-    // ── INPUT: factory untuk membuat JTextField bergaya tema dark ──
     static JTextField field() {
         JTextField tf = new JTextField();
         tf.setBackground(new Color(28, 34, 60));
@@ -1076,15 +1022,6 @@ public class Main extends JFrame {
         return outer;
     }
 
-    static JTabbedPane darkTabs() {
-        JTabbedPane tp = new JTabbedPane();
-        tp.setBackground(C_PANEL);
-        tp.setForeground(C_TEXT);
-        tp.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tp.setBorder(BorderFactory.createLineBorder(C_BORDER));
-        return tp;
-    }
-
     static JButton actionBtn(String text, Color base) {
         JButton b = new JButton(text) {
             boolean hov = false;
@@ -1113,7 +1050,7 @@ public class Main extends JFrame {
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
         catch (Exception ignored) {
-            // ── EXCEPTION: jika Look and Feel sistem gagal di-set, abaikan dan pakai default ──
+            // EXCEPTION: jika Look and Feel sistem gagal, abaikan dan pakai default
         }
         SwingUtilities.invokeLater(Main::new);
     }
