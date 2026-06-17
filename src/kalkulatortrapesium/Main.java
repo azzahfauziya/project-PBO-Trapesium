@@ -32,6 +32,7 @@ public class Main extends JFrame {
 
     private JPanel     cardContainer;
     private CardLayout cardLayout;
+    private JPanel     topBar;
 
     public Main() {
         setTitle("Kalkulator Trapesium");
@@ -42,69 +43,59 @@ public class Main extends JFrame {
         getContentPane().setBackground(C_BG);
         setLayout(new BorderLayout());
 
-        add(buildSidebar(), BorderLayout.WEST);
+        add(buildTopBar(), BorderLayout.NORTH);
 
         cardLayout    = new CardLayout();
         cardContainer = new JPanel(cardLayout);
         cardContainer.setBackground(C_BG);
-        cardContainer.add(new HomePanel(),  "home");
         cardContainer.add(new Menu1Panel(), "menu1");
         cardContainer.add(new Menu2Panel(), "menu2");
         add(cardContainer, BorderLayout.CENTER);
 
-        cardLayout.show(cardContainer, "home");
+        cardLayout.show(cardContainer, "menu1");
         setVisible(true);
     }
 
     void showCard(String name) { cardLayout.show(cardContainer, name); }
 
     // ══════════════════════════════════════════════════════════════
-    //  SIDEBAR
+    //  TOP BAR
     // ══════════════════════════════════════════════════════════════
-    JPanel buildSidebar() {
-        JPanel sb = new JPanel() {
+    JPanel buildTopBar() {
+        topBar = new JPanel() {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setPaint(new GradientPaint(0, 0, new Color(14, 18, 36), 0, getHeight(), new Color(10, 12, 22)));
+                g2.setPaint(new GradientPaint(0, 0, new Color(14, 18, 36), getWidth(), 0, new Color(10, 12, 22)));
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 g2.setColor(C_BORDER);
-                g2.fillRect(getWidth() - 1, 0, 1, getHeight());
+                g2.fillRect(0, getHeight() - 1, getWidth(), 1);
             }
         };
-        sb.setPreferredSize(new Dimension(200, 0));
-        sb.setLayout(new BorderLayout());
-        sb.setOpaque(false);
+        topBar.setLayout(new BorderLayout());
+        topBar.setOpaque(false);
+        topBar.setPreferredSize(new Dimension(0, 60));
 
-        JPanel logo = new JPanel();
-        logo.setOpaque(false);
-        logo.setLayout(new BoxLayout(logo, BoxLayout.Y_AXIS));
-        logo.setBorder(BorderFactory.createEmptyBorder(28, 20, 20, 20));
-        JLabel icon  = mkLabel("", 32, Font.BOLD, C_ACCENT);  icon.setAlignmentX(CENTER_ALIGNMENT);
-        JLabel title = mkLabel("TRAPESIUM", 13, Font.BOLD, C_TEXT); title.setAlignmentX(CENTER_ALIGNMENT);
-        JLabel sub   = mkLabel("KALKULATOR", 10, Font.PLAIN, C_MUTED); sub.setAlignmentX(CENTER_ALIGNMENT);
-        logo.add(icon); logo.add(Box.createVerticalStrut(6)); logo.add(title); logo.add(sub);
-        sb.add(logo, BorderLayout.NORTH);
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        left.setOpaque(false);
+        left.setBorder(BorderFactory.createEmptyBorder(0, 14, 0, 0));
+        JLabel icon  = mkLabel("", 28, Font.BOLD, C_ACCENT);
+        JLabel title = mkLabel("TRAPESIUM", 14, Font.BOLD, C_TEXT);
+        left.add(icon);
+        left.add(Box.createHorizontalStrut(4));
+        left.add(title);
+        topBar.add(left, BorderLayout.WEST);
 
-        JPanel nav = new JPanel();
+        JPanel nav = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
         nav.setOpaque(false);
-        nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
-        nav.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
-        nav.add(navBtn("  Beranda",        "home",  C_ACCENT2));
-        nav.add(Box.createVerticalStrut(6));
-        nav.add(navBtn("  Input Manual",   "menu1", C_ACCENT));
-        nav.add(Box.createVerticalStrut(6));
-        nav.add(navBtn("  Multithreading", "menu2", C_ACCENT3));
-        sb.add(nav, BorderLayout.CENTER);
+        nav.add(topBtn("Input Manual", "menu1", C_ACCENT2));
+        nav.add(topBtn("Multithreading", "menu2", C_ACCENT3));
+        topBar.add(nav, BorderLayout.CENTER);
 
-        JLabel ver = mkLabel("v1.0 · Java Swing", 10, Font.ITALIC, C_MUTED);
-        ver.setHorizontalAlignment(SwingConstants.CENTER);
-        ver.setBorder(BorderFactory.createEmptyBorder(0, 0, 14, 0));
-        sb.add(ver, BorderLayout.SOUTH);
-        return sb;
+        return topBar;
     }
 
-    JButton navBtn(String text, String card, Color accent) {
+    JButton topBtn(String text, String card, Color accent) {
         JButton b = new JButton(text) {
             boolean hov = false;
             { setOpaque(false); setContentAreaFilled(false); setBorderPainted(false); setFocusPainted(false);
@@ -127,75 +118,9 @@ public class Main extends JFrame {
         };
         b.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         b.setForeground(C_TEXT);
-        b.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        b.setHorizontalAlignment(SwingConstants.LEFT);
-        b.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        b.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
         b.addActionListener(e -> showCard(card));
         return b;
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  HOME PANEL
-    // ══════════════════════════════════════════════════════════════
-    class HomePanel extends JPanel {
-        HomePanel() {
-            setBackground(C_BG);
-            setLayout(new GridBagLayout());
-            JPanel box = new JPanel();
-            box.setOpaque(false);
-            box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
-
-            JLabel h   = mkLabel("Kalkulator Trapesium", 28, Font.BOLD, C_TEXT);
-            JLabel sub = mkLabel("2D · Prisma · Limas",  14, Font.PLAIN, C_MUTED);
-            h.setAlignmentX(CENTER_ALIGNMENT);
-            sub.setAlignmentX(CENTER_ALIGNMENT);
-            box.add(h); box.add(Box.createVerticalStrut(6)); box.add(sub);
-            box.add(Box.createVerticalStrut(36));
-
-            for (String[] item : new String[][]{
-                {"", "Input Manual",   "Hitung Trapesium 2D, Prisma, atau Limas\ndengan memasukkan sisi secara manual.", "menu1"},
-                {"", "Multithreading", "Generate data random, proses paralel\ndengan thread pool dan visualisasi.",      "menu2"}
-            }) {
-                JButton card = homeCard(item[0], item[1], item[2], item[3]);
-                card.setAlignmentX(CENTER_ALIGNMENT);
-                box.add(card);
-                box.add(Box.createVerticalStrut(14));
-            }
-            add(box);
-        }
-
-        JButton homeCard(String ico, String ttl, String desc, String card) {
-            JButton b = new JButton() {
-                boolean hov = false;
-                { setOpaque(false); setContentAreaFilled(false); setBorderPainted(false); setFocusPainted(false);
-                  setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                  setPreferredSize(new Dimension(400, 90)); setMaximumSize(new Dimension(400, 90));
-                  addMouseListener(new MouseAdapter() {
-                      public void mouseEntered(MouseEvent e) { hov = true;  repaint(); }
-                      public void mouseExited (MouseEvent e) { hov = false; repaint(); }
-                  });
-                }
-                @Override protected void paintComponent(Graphics g) {
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2.setColor(hov ? new Color(26, 32, 58) : C_PANEL);
-                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
-                    g2.setColor(hov ? C_ACCENT : C_BORDER);
-                    g2.setStroke(new BasicStroke(1.5f));
-                    g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 14, 14);
-                    g2.setFont(new Font("Segoe UI", Font.BOLD, 28)); g2.setColor(C_ACCENT);
-                    g2.drawString(ico, 20, 52);
-                    g2.setFont(new Font("Segoe UI", Font.BOLD, 14)); g2.setColor(C_TEXT);
-                    g2.drawString(ttl, 66, 34);
-                    g2.setFont(new Font("Segoe UI", Font.PLAIN, 11)); g2.setColor(C_MUTED);
-                    String[] lines = desc.split("\n");
-                    for (int i = 0; i < lines.length; i++) g2.drawString(lines[i], 66, 52 + i * 15);
-                    g2.dispose();
-                }
-            };
-            b.addActionListener(e -> showCard(card));
-            return b;
-        }
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -309,10 +234,8 @@ public class Main extends JFrame {
         // HITUNG TRAPESIUM 2D
         // ══════════════════════════════════════════════════════
         void hitung2D() {
-            // EXCEPTION: NumberFormatException jika input bukan angka (ditangkap di dbl())
             try {
                 double atas=dbl(f2D[0]),bawah=dbl(f2D[1]),tinggi=dbl(f2D[2]),kiri=dbl(f2D[3]),kanan=dbl(f2D[4]);
-                // EXCEPTION: IllegalArgumentException dari constructor Trapesium jika nilai tidak valid
                 Trapesium t = new Trapesium(atas,bawah,tinggi,kiri,kanan);
                 double L=t.hitungLuas(), K=t.hitungKeliling();
                 resultTitle.setText("Hasil — Trapesium 2D");
@@ -330,10 +253,8 @@ public class Main extends JFrame {
                     String.format("    = %.2f + %.2f + %.2f + %.2f\n",atas,bawah,kiri,kanan)+
                     String.format("    = %.2f\n",K));
             } catch (NumberFormatException ex) {
-                // EXCEPTION: input bukan angka — tampilkan warning sederhana
                 showErr("Input harus berupa angka.");
             } catch (IllegalArgumentException ex) {
-                // EXCEPTION: nilai tidak valid dari constructor Trapesium
                 showErr(ex.getMessage());
             }
         }
@@ -342,10 +263,8 @@ public class Main extends JFrame {
         // HITUNG PRISMA
         // ══════════════════════════════════════════════════════
         void hitungPrisma() {
-            // EXCEPTION: NumberFormatException jika input bukan angka (ditangkap di dbl())
             try {
                 double a=dbl(fPr[0]),b=dbl(fPr[1]),t=dbl(fPr[2]),ki=dbl(fPr[3]),ka=dbl(fPr[4]),p=dbl(fPr[5]);
-                // EXCEPTION: IllegalArgumentException dari constructor PrismaTrapesium jika nilai tidak valid
                 PrismaTrapesium pr = new PrismaTrapesium(a,b,t,ki,ka,p);
                 double L=pr.hitungLuas(a,b,t), K=pr.hitungKeliling(a,b,ki,ka);
                 double V=pr.hitungVolume(a,b,t), LP=pr.hitungLuasPermukaan(a,b,ka,ki,t);
@@ -366,10 +285,8 @@ public class Main extends JFrame {
                     String.format("     = (2×%.2f)+(%.2f+%.2f+%.2f+%.2f)×%.2f\n",L,a,b,ki,ka,p)+
                     String.format("     = %.2f\n",LP));
             } catch (NumberFormatException ex) {
-                // EXCEPTION: input bukan angka — tampilkan warning sederhana
                 showErr("Input harus berupa angka.");
             } catch (IllegalArgumentException ex) {
-                // EXCEPTION: nilai tidak valid dari constructor PrismaTrapesium
                 showErr(ex.getMessage());
             }
         }
@@ -378,10 +295,8 @@ public class Main extends JFrame {
         // HITUNG LIMAS
         // ══════════════════════════════════════════════════════
         void hitungLimas() {
-            // EXCEPTION: NumberFormatException jika input bukan angka (ditangkap di dbl())
             try {
                 double a=dbl(fLi[0]),b=dbl(fLi[1]),t=dbl(fLi[2]),ki=dbl(fLi[3]),ka=dbl(fLi[4]),tl=dbl(fLi[5]);
-                // EXCEPTION: IllegalArgumentException dari constructor LimasTrapesium jika nilai tidak valid
                 LimasTrapesium li = new LimasTrapesium(a,b,t,ki,ka,tl);
                 double L=li.hitungLuas(a,b,t), K=li.hitungKeliling(a,b,ki,ka);
                 double V=li.hitungVolume(a,b,t), LP=li.hitungLuasPermukaan(a,b,t,ki,ka);
@@ -404,10 +319,8 @@ public class Main extends JFrame {
                     "  ── Luas Permukaan ───────────────────\n"+
                     String.format("  LP = %.2f\n",LP));
             } catch (NumberFormatException ex) {
-                // EXCEPTION: input bukan angka — tampilkan warning sederhana
                 showErr("Input harus berupa angka.");
             } catch (IllegalArgumentException ex) {
-                // EXCEPTION: nilai tidak valid dari constructor LimasTrapesium
                 showErr(ex.getMessage());
             }
         }
@@ -417,8 +330,6 @@ public class Main extends JFrame {
             result.setText("Detail: " + msg);
         }
 
-        // EXCEPTION: parsing input teks -> double.
-        // Melempar NumberFormatException jika teks bukan angka.
         double dbl(JTextField tf) {
             return Double.parseDouble(tf.getText().trim());
         }
@@ -538,7 +449,6 @@ public class Main extends JFrame {
             ed.getTextField().setFont(new Font("Consolas", Font.PLAIN, 13));
             bar.add(spinner);
 
-            // START MULTITHREADING: tombol memanggil startMultithreading()
             runBtn = actionBtn("Jalankan", C_ACCENT);
             runBtn.addActionListener(e -> startMultithreading());
             bar.add(runBtn);
@@ -597,7 +507,7 @@ public class Main extends JFrame {
         }
 
         // ══════════════════════════════════════════════════════
-        // START MULTITHREADING: method utama menjalankan thread
+        // START MULTITHREADING
         // ══════════════════════════════════════════════════════
         void startMultithreading() {
             int n = (int) spinner.getValue();
@@ -613,7 +523,6 @@ public class Main extends JFrame {
             int poolSize  = Math.min(n, 4);
             visualPanel.initThreads(poolSize, n);
 
-            // START MULTITHREADING: buat thread pool tetap (maks 4 thread paralel)
             ExecutorService pool = Executors.newFixedThreadPool(poolSize);
             AtomicInteger done   = new AtomicInteger(0);
             long[] gStart        = { System.currentTimeMillis() };
@@ -630,7 +539,6 @@ public class Main extends JFrame {
                 final double kanan  = Math.round((rng.nextDouble() * 5  + 2)    * 10.0) / 10.0;
                 final double extra  = Math.round((rng.nextDouble() * 8  + 3)    * 10.0) / 10.0;
 
-                // START MULTITHREADING: setiap job dikirim ke pool (maks 4 berjalan paralel)
                 pool.submit(() -> {
                     String tn   = Thread.currentThread().getName();
                     int    tIdx = threadIndex(tn, poolSize);
@@ -645,7 +553,6 @@ public class Main extends JFrame {
                     String jenis;
                     double luas = 0, kel = 0, vol = Double.NaN, lp = Double.NaN;
 
-                    // EXCEPTION: IllegalArgumentException dari constructor masing-masing kelas
                     try {
                         if (type == 0) {
                             jenis = "Trapesium 2D";
@@ -668,7 +575,6 @@ public class Main extends JFrame {
                             lp   = li.hitungLuasPermukaan(atas, bawah, tinggi, kiri, kanan);
                         }
                     } catch (IllegalArgumentException ex) {
-                        // EXCEPTION: nilai tidak valid dari constructor kelas bangun
                         SwingUtilities.invokeLater(() ->
                             appendLog("[ERROR] #" + idx + " " + ex.getMessage()));
                         done.incrementAndGet();
@@ -723,7 +629,6 @@ public class Main extends JFrame {
                     });
                 });
             }
-            // START MULTITHREADING: pool shutdown setelah semua job selesai dikirim
             pool.shutdown();
         }
         
@@ -742,7 +647,6 @@ public class Main extends JFrame {
                 String[] p = tn.split("-");
                 return (Integer.parseInt(p[p.length - 1]) - 1) % poolSize;
             } catch (Exception e) {
-                // EXCEPTION: fallback jika nama thread tidak sesuai pola
                 return 0;
             }
         }
@@ -770,7 +674,7 @@ public class Main extends JFrame {
             int           activeJob = -1;
             int           totalDone = 0;
             long          totalMs   = 0;
-            ThreadRow(int i, Color c) { tIdx=i; color=c; name="Thread-"+(i+1); }
+            ThreadRow(int i, Color c) { tIdx=i; name="Thread-"+(i+1); color=c; }
         }
 
         List<ThreadRow> rows      = new ArrayList<>();
@@ -946,7 +850,7 @@ public class Main extends JFrame {
                 g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 g2.setColor(C_SUCCESS);
                 FontMetrics fm3 = g2.getFontMetrics();
-                g2.drawString(" ", x + (w - fm3.stringWidth(" ")) / 2, y + 52);
+                g2.drawString("✓", x + (w - fm3.stringWidth("✓")) / 2, y + 52);
                 g2.setFont(new Font("Segoe UI", Font.PLAIN, 8));
                 g2.setColor(new Color(90, 120, 160));
                 String msStr = card.ms + "ms";
@@ -1049,9 +953,7 @@ public class Main extends JFrame {
 
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-        catch (Exception ignored) {
-            // EXCEPTION: jika Look and Feel sistem gagal, abaikan dan pakai default
-        }
+        catch (Exception ignored) {}
         SwingUtilities.invokeLater(Main::new);
     }
 }
