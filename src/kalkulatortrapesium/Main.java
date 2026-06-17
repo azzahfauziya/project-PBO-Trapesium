@@ -32,7 +32,25 @@ public class Main extends JFrame {
 
     private JPanel     cardContainer;
     private CardLayout cardLayout;
-    private JPanel     topBar;
+
+    // Menu 1 components
+    private JTextField[] f2D = new JTextField[5];
+    private JTextField[] fPr = new JTextField[6];
+    private JTextField[] fLi = new JTextField[6];
+    private JTextArea result;
+    private JLabel resultTitle;
+    private JComboBox<String> shapeSelector;
+    private JPanel cardPanel;
+    private CardLayout cardLayoutInput;
+
+    // Menu 2 components
+    private JSpinner spinner;
+    private JButton runBtn;
+    private JLabel statusLabel;
+    private JProgressBar progressBar;
+    private ThreadVisualPanel visualPanel;
+    private JTextArea logArea;
+    private DefaultTableModel tableModel;
 
     public Main() {
         setTitle("Kalkulator Trapesium");
@@ -45,11 +63,11 @@ public class Main extends JFrame {
 
         add(buildTopBar(), BorderLayout.NORTH);
 
-        cardLayout    = new CardLayout();
+        cardLayout = new CardLayout();
         cardContainer = new JPanel(cardLayout);
         cardContainer.setBackground(C_BG);
-        cardContainer.add(new Menu1Panel(), "menu1");
-        cardContainer.add(new Menu2Panel(), "menu2");
+        cardContainer.add(buildMenu1(), "menu1");
+        cardContainer.add(buildMenu2(), "menu2");
         add(cardContainer, BorderLayout.CENTER);
 
         cardLayout.show(cardContainer, "menu1");
@@ -62,7 +80,7 @@ public class Main extends JFrame {
     //  TOP BAR
     // ══════════════════════════════════════════════════════════════
     JPanel buildTopBar() {
-        topBar = new JPanel() {
+        JPanel topBar = new JPanel() {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -79,7 +97,7 @@ public class Main extends JFrame {
         JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         left.setOpaque(false);
         left.setBorder(BorderFactory.createEmptyBorder(0, 14, 0, 0));
-        JLabel icon  = mkLabel("", 28, Font.BOLD, C_ACCENT);
+        JLabel icon = mkLabel("", 28, Font.BOLD, C_ACCENT);
         JLabel title = mkLabel("TRAPESIUM", 14, Font.BOLD, C_TEXT);
         left.add(icon);
         left.add(Box.createHorizontalStrut(4));
@@ -126,38 +144,12 @@ public class Main extends JFrame {
     // ══════════════════════════════════════════════════════════════
     //  MENU 1 — INPUT MANUAL
     // ══════════════════════════════════════════════════════════════
-public class Menu1Panel extends JPanel {
-
-    // Konstanta warna (sesuaikan dengan yang ada di kelas utama)
-    private static final Color C_BG      = new Color(18, 24, 44);
-    private static final Color C_PANEL   = new Color(28, 36, 64);
-    private static final Color C_TEXT    = Color.WHITE;
-    private static final Color C_TEXTPILIH    = Color.BLACK;
-    private static final Color C_ACCENT  = new Color(0, 180, 255);
-    private static final Color C_ACCENT2 = new Color(255, 200, 50);
-    private static final Color C_ACCENT3 = new Color(255, 100, 100);
-    private static final Color C_BORDER  = new Color(80, 80, 100);
-
-    // Field input untuk masing-masing bangun
-    private JTextField[] f2D = new JTextField[5];
-    private JTextField[] fPr = new JTextField[6];
-    private JTextField[] fLi = new JTextField[6];
-
-    // Area hasil dan judul
-    private JTextArea result;
-    private JLabel    resultTitle;
-
-    // Komponen pemilihan
-    private JComboBox<String> shapeSelector;
-    private JPanel            cardPanel;
-    private CardLayout        cardLayout;
-
-    public Menu1Panel() {
-        setBackground(C_BG);
-        setLayout(new BorderLayout());
+    private JPanel buildMenu1() {
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(C_BG);
 
         // Header
-        add(buildHeader("Input Manual",
+        mainPanel.add(buildHeader("Input Manual",
                 "Masukkan panjang sisi untuk menghitung luas, keliling, volume, dan luas permukaan."),
                 BorderLayout.NORTH);
 
@@ -174,16 +166,16 @@ public class Menu1Panel extends JPanel {
         shapeSelector = new JComboBox<>(new String[]{"Trapesium 2D", "Prisma", "Limas"});
         shapeSelector.setFont(new Font("Segoe UI", Font.BOLD, 13));
         shapeSelector.setBackground(C_PANEL);
-        shapeSelector.setForeground(C_TEXTPILIH);
+        shapeSelector.setForeground(Color.BLACK);
         shapeSelector.setBorder(BorderFactory.createLineBorder(C_BORDER));
         left.add(shapeSelector, BorderLayout.NORTH);
 
         // CardLayout untuk input fields
-        cardLayout = new CardLayout();
-        cardPanel = new JPanel(cardLayout);
+        cardLayoutInput = new CardLayout();
+        cardPanel = new JPanel(cardLayoutInput);
         cardPanel.setBackground(C_BG);
 
-        // Buat tiga panel input (tanpa tombol masing-masing)
+        // Buat tiga panel input
         cardPanel.add(createInputPanel2D(), "2D");
         cardPanel.add(createInputPanelPrisma(), "Prisma");
         cardPanel.add(createInputPanelLimas(), "Limas");
@@ -197,7 +189,7 @@ public class Menu1Panel extends JPanel {
         btnHitung.setForeground(Color.BLACK);
         btnHitung.setFocusPainted(false);
         btnHitung.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        btnHitung.addActionListener(e -> hitung()); // ← inti: if-else di sini
+        btnHitung.addActionListener(e -> hitung());
         left.add(btnHitung, BorderLayout.SOUTH);
 
         // Atur lebar preferensi
@@ -222,80 +214,23 @@ public class Menu1Panel extends JPanel {
         right.add(rsp, BorderLayout.CENTER);
 
         body.add(right, BorderLayout.CENTER);
-        add(body, BorderLayout.CENTER);
+        mainPanel.add(body, BorderLayout.CENTER);
 
         // Tampilkan panel pertama secara default
         shapeSelector.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 String selected = (String) e.getItem();
                 switch (selected) {
-                    case "Trapesium 2D": cardLayout.show(cardPanel, "2D"); break;
-                    case "Prisma":       cardLayout.show(cardPanel, "Prisma"); break;
-                    case "Limas":        cardLayout.show(cardPanel, "Limas"); break;
+                    case "Trapesium 2D": cardLayoutInput.show(cardPanel, "2D"); break;
+                    case "Prisma":       cardLayoutInput.show(cardPanel, "Prisma"); break;
+                    case "Limas":        cardLayoutInput.show(cardPanel, "Limas"); break;
                 }
             }
         });
+
+        return mainPanel;
     }
 
-    // ─── Helper untuk membuat label ──────────────────────────────────────────
-    private JLabel mkLabel(String text, int size, int style, Color color) {
-        JLabel lbl = new JLabel(text);
-        lbl.setFont(new Font("Segoe UI", style, size));
-        lbl.setForeground(color);
-        return lbl;
-    }
-
-    private JPanel buildHeader(String title, String subtitle) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(C_BG);
-        p.setBorder(BorderFactory.createEmptyBorder(16, 20, 12, 20));
-        JLabel t = mkLabel(title, 18, Font.BOLD, C_ACCENT2);
-        JLabel s = mkLabel(subtitle, 12, Font.PLAIN, C_TEXT);
-        p.add(t, BorderLayout.NORTH);
-        p.add(s, BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel formPanel() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBackground(C_BG);
-        p.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        return p;
-    }
-
-    private JTextField field() {
-        JTextField tf = new JTextField(8);
-        tf.setBackground(C_PANEL);
-        tf.setForeground(C_TEXT);
-        tf.setCaretColor(C_TEXT);
-        tf.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(C_BORDER),
-                BorderFactory.createEmptyBorder(4, 6, 4, 6)
-        ));
-        tf.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        return tf;
-    }
-
-    private void addRow(JPanel parent, String label, JTextField field) {
-        JPanel row = new JPanel(new BorderLayout(8, 0));
-        row.setBackground(C_BG);
-        JLabel lbl = mkLabel(label, 12, Font.PLAIN, C_TEXT);
-        lbl.setPreferredSize(new Dimension(100, 24));
-        row.add(lbl, BorderLayout.WEST);
-        row.add(field, BorderLayout.CENTER);
-        parent.add(row);
-        parent.add(Box.createVerticalStrut(6));
-    }
-
-    private JPanel wrap(JPanel p) {
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setBackground(C_BG);
-        wrapper.add(p, BorderLayout.NORTH);
-        return wrapper;
-    }
-
-    // ─── Panel input untuk masing-masing bangun (tanpa tombol) ──────────────
     private JPanel createInputPanel2D() {
         JPanel p = formPanel();
         String[] lbl = {"Sisi Atas", "Sisi Bawah", "Tinggi", "Sisi Kiri", "Sisi Kanan"};
@@ -326,7 +261,7 @@ public class Menu1Panel extends JPanel {
         return wrap(p);
     }
 
-    // ─── Method hitung utama dengan if-else ──────────────────────────────────
+    // ─── Method hitung utama ──────────────────────────────────
     private void hitung() {
         int selected = shapeSelector.getSelectedIndex();
         try {
@@ -342,8 +277,7 @@ public class Menu1Panel extends JPanel {
         }
     }
 
-    // ─── Hitung Trapesium 2D (sama seperti asli) ─────────────────────────────
-    void hitung2D() {
+    private void hitung2D() {
         try {
             double atas = dbl(f2D[0]), bawah = dbl(f2D[1]), tinggi = dbl(f2D[2]);
             double kiri = dbl(f2D[3]), kanan = dbl(f2D[4]);
@@ -370,8 +304,7 @@ public class Menu1Panel extends JPanel {
         }
     }
 
-    // ─── Hitung Prisma ─────────────────────────────────────────────────────────
-    void hitungPrisma() {
+    private void hitungPrisma() {
         try {
             double a = dbl(fPr[0]), b = dbl(fPr[1]), t = dbl(fPr[2]);
             double ki = dbl(fPr[3]), ka = dbl(fPr[4]), p = dbl(fPr[5]);
@@ -403,8 +336,7 @@ public class Menu1Panel extends JPanel {
         }
     }
 
-    // ─── Hitung Limas ──────────────────────────────────────────────────────────
-    void hitungLimas() {
+    private void hitungLimas() {
         try {
             double a = dbl(fLi[0]), b = dbl(fLi[1]), t = dbl(fLi[2]);
             double ki = dbl(fLi[3]), ka = dbl(fLi[4]), tl = dbl(fLi[5]);
@@ -447,327 +379,406 @@ public class Menu1Panel extends JPanel {
     private double dbl(JTextField tf) {
         return Double.parseDouble(tf.getText().trim());
     }
-}
-    
+
     // ══════════════════════════════════════════════════════════════
     //  MENU 2 — MULTITHREADING VISUAL
     // ══════════════════════════════════════════════════════════════
-    class Menu2Panel extends JPanel {
-
-        JSpinner          spinner;
-        JButton           runBtn;
-        JLabel            statusLabel;
-        JProgressBar      progressBar;
-        ThreadVisualPanel visualPanel;
-        JTextArea         logArea;
-        DefaultTableModel tableModel;
-
-        static final String[] COLS = {
-            "#", "Jenis", "Atas", "Bawah", "Tinggi", "Kiri", "Kanan", "Extra",
-            "Luas", "Keliling", "Volume", "Luas Permukaan", "Thread", "ms"
-        };
-
-        Menu2Panel() {
-            setBackground(C_BG);
-            setLayout(new BorderLayout());
-            add(buildHeader("Multithreading",
+    private JPanel buildMenu2() {
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(C_BG);
+        mainPanel.add(buildHeader("Multithreading",
                 "Generate data random, proses paralel dengan thread pool, visualisasi real-time."),
                 BorderLayout.NORTH);
 
-            JPanel body = new JPanel(new BorderLayout(0, 8));
-            body.setBackground(C_BG);
-            body.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
-            body.add(buildControlBar(), BorderLayout.NORTH);
+        JPanel body = new JPanel(new BorderLayout(0, 8));
+        body.setBackground(C_BG);
+        body.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
+        body.add(buildControlBar(), BorderLayout.NORTH);
 
-            JSplitPane mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-            mainSplit.setBackground(C_BG);
-            mainSplit.setDividerSize(7);
-            mainSplit.setResizeWeight(0.45);
-            mainSplit.setBorder(null);
+        JSplitPane mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        mainSplit.setBackground(C_BG);
+        mainSplit.setDividerSize(7);
+        mainSplit.setResizeWeight(0.45);
+        mainSplit.setBorder(null);
 
-            JSplitPane topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-            topSplit.setBackground(C_BG);
-            topSplit.setDividerSize(5);
-            topSplit.setResizeWeight(0.65);
-            topSplit.setBorder(null);
+        JSplitPane topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        topSplit.setBackground(C_BG);
+        topSplit.setDividerSize(5);
+        topSplit.setResizeWeight(0.65);
+        topSplit.setBorder(null);
 
-            visualPanel = new ThreadVisualPanel();
-            JScrollPane vsp = new JScrollPane(visualPanel);
-            vsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
-            vsp.getViewport().setBackground(new Color(14, 18, 34));
-            topSplit.setTopComponent(vsp);
+        visualPanel = new ThreadVisualPanel();
+        JScrollPane vsp = new JScrollPane(visualPanel);
+        vsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
+        vsp.getViewport().setBackground(new Color(14, 18, 34));
+        topSplit.setTopComponent(vsp);
 
-            JPanel logPanel = new JPanel(new BorderLayout(0, 4));
-            logPanel.setBackground(C_BG);
-            logPanel.add(mkLabel("  Thread Log", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
-            logArea = new JTextArea();
-            logArea.setEditable(false);
-            logArea.setBackground(new Color(8, 10, 20));
-            logArea.setForeground(new Color(130, 210, 130));
-            logArea.setFont(new Font("Consolas", Font.PLAIN, 11));
-            logArea.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
-            JScrollPane lsp = new JScrollPane(logArea);
-            lsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
-            logPanel.add(lsp, BorderLayout.CENTER);
-            topSplit.setBottomComponent(logPanel);
+        JPanel logPanel = new JPanel(new BorderLayout(0, 4));
+        logPanel.setBackground(C_BG);
+        logPanel.add(mkLabel("  Thread Log", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
+        logArea = new JTextArea();
+        logArea.setEditable(false);
+        logArea.setBackground(new Color(8, 10, 20));
+        logArea.setForeground(new Color(130, 210, 130));
+        logArea.setFont(new Font("Consolas", Font.PLAIN, 11));
+        logArea.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        JScrollPane lsp = new JScrollPane(logArea);
+        lsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
+        logPanel.add(lsp, BorderLayout.CENTER);
+        topSplit.setBottomComponent(logPanel);
 
-            mainSplit.setTopComponent(topSplit);
+        mainSplit.setTopComponent(topSplit);
 
-            JPanel tablePanel = new JPanel(new BorderLayout(0, 4));
-            tablePanel.setBackground(C_BG);
-            tablePanel.add(mkLabel("  Tabel Hasil Perhitungan", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
+        JPanel tablePanel = new JPanel(new BorderLayout(0, 4));
+        tablePanel.setBackground(C_BG);
+        tablePanel.add(mkLabel("  Tabel Hasil Perhitungan", 11, Font.BOLD, C_MUTED), BorderLayout.NORTH);
 
-            tableModel = new DefaultTableModel(COLS, 0) {
-                @Override public boolean isCellEditable(int r, int c) { return false; }
-            };
-            JTable table = new JTable(tableModel);
-            styleTable(table);
-            JScrollPane tsp = new JScrollPane(table);
-            tsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
-            tsp.getViewport().setBackground(C_PANEL);
-            tablePanel.add(tsp, BorderLayout.CENTER);
-            mainSplit.setBottomComponent(tablePanel);
+        String[] COLS = {
+            "#", "Jenis", "Atas", "Bawah", "Tinggi", "Kiri", "Kanan", "Extra",
+            "Luas", "Keliling", "Volume", "Luas Permukaan", "Thread", "ms"
+        };
+        tableModel = new DefaultTableModel(COLS, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+        JTable table = new JTable(tableModel);
+        styleTable(table);
+        JScrollPane tsp = new JScrollPane(table);
+        tsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
+        tsp.getViewport().setBackground(C_PANEL);
+        tablePanel.add(tsp, BorderLayout.CENTER);
+        mainSplit.setBottomComponent(tablePanel);
 
-            body.add(mainSplit, BorderLayout.CENTER);
+        body.add(mainSplit, BorderLayout.CENTER);
 
-            JPanel progRow = new JPanel(new BorderLayout(8, 0));
-            progRow.setBackground(C_BG);
-            progRow.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
-            progressBar = new JProgressBar(0, 100);
-            progressBar.setStringPainted(true);
-            progressBar.setFont(new Font("Segoe UI", Font.BOLD, 11));
-            progressBar.setForeground(C_ACCENT);
-            progressBar.setBackground(new Color(22, 28, 52));
-            progressBar.setPreferredSize(new Dimension(0, 20));
-            statusLabel = mkLabel("Siap.", 11, Font.ITALIC, C_MUTED);
-            progRow.add(progressBar, BorderLayout.CENTER);
-            progRow.add(statusLabel, BorderLayout.EAST);
-            body.add(progRow, BorderLayout.SOUTH);
+        JPanel progRow = new JPanel(new BorderLayout(8, 0));
+        progRow.setBackground(C_BG);
+        progRow.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setStringPainted(true);
+        progressBar.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        progressBar.setForeground(C_ACCENT);
+        progressBar.setBackground(new Color(22, 28, 52));
+        progressBar.setPreferredSize(new Dimension(0, 20));
+        statusLabel = mkLabel("Siap.", 11, Font.ITALIC, C_MUTED);
+        progRow.add(progressBar, BorderLayout.CENTER);
+        progRow.add(statusLabel, BorderLayout.EAST);
+        body.add(progRow, BorderLayout.SOUTH);
 
-            add(body, BorderLayout.CENTER);
-        }
+        mainPanel.add(body, BorderLayout.CENTER);
+        return mainPanel;
+    }
 
-        JPanel buildControlBar() {
-            JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
-            bar.setBackground(C_BG);
-            bar.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
+    private JPanel buildControlBar() {
+        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
+        bar.setBackground(C_BG);
+        bar.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
 
-            bar.add(mkLabel("Jumlah Data:", 13, Font.PLAIN, C_TEXT));
+        bar.add(mkLabel("Jumlah Data:", 13, Font.PLAIN, C_TEXT));
 
-            spinner = new JSpinner(new SpinnerNumberModel(6, 1, Integer.MAX_VALUE, 1));
-            spinner.setPreferredSize(new Dimension(90, 30));
-            JSpinner.NumberEditor ed = new JSpinner.NumberEditor(spinner, "#");
-            spinner.setEditor(ed);
-            ed.getTextField().setBackground(C_PANEL);
-            ed.getTextField().setForeground(C_TEXT);
-            ed.getTextField().setFont(new Font("Consolas", Font.PLAIN, 13));
-            bar.add(spinner);
+        spinner = new JSpinner(new SpinnerNumberModel(6, 1, Integer.MAX_VALUE, 1));
+        spinner.setPreferredSize(new Dimension(90, 30));
+        JSpinner.NumberEditor ed = new JSpinner.NumberEditor(spinner, "#");
+        spinner.setEditor(ed);
+        ed.getTextField().setBackground(C_PANEL);
+        ed.getTextField().setForeground(C_TEXT);
+        ed.getTextField().setFont(new Font("Consolas", Font.PLAIN, 13));
+        bar.add(spinner);
 
-            runBtn = actionBtn("Jalankan", C_ACCENT);
-            runBtn.addActionListener(e -> startMultithreading());
-            bar.add(runBtn);
+        runBtn = actionBtn("Jalankan", C_ACCENT);
+        runBtn.addActionListener(e -> startMultithreading());
+        bar.add(runBtn);
 
-            JButton clrBtn = actionBtn("Bersihkan", new Color(80, 40, 40));
-            clrBtn.addActionListener(e -> {
-                visualPanel.clear();
-                logArea.setText("");
-                tableModel.setRowCount(0);
-                progressBar.setValue(0);
-                statusLabel.setText("Siap.");
-            });
-            bar.add(clrBtn);
-
-            bar.add(mkLabel("  Thread pool: 4 thread paralel", 11, Font.ITALIC, C_MUTED));
-            return bar;
-        }
-
-        void styleTable(JTable t) {
-            t.setBackground(C_PANEL);
-            t.setForeground(C_TEXT);
-            t.setGridColor(new Color(30, 42, 72));
-            t.setRowHeight(24);
-            t.setFont(new Font("Consolas", Font.PLAIN, 11));
-            t.setSelectionBackground(new Color(30, 60, 100));
-            t.setSelectionForeground(Color.WHITE);
-            t.setShowHorizontalLines(true);
-            t.setShowVerticalLines(true);
-            t.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
-            JTableHeader hdr = t.getTableHeader();
-            hdr.setBackground(new Color(20, 28, 55));
-            hdr.setForeground(C_ACCENT2);
-            hdr.setFont(new Font("Segoe UI", Font.BOLD, 11));
-            hdr.setReorderingAllowed(false);
-
-            int[] w = {36, 90, 52, 52, 52, 52, 52, 60, 72, 76, 86, 106, 150, 52};
-            for (int i = 0; i < w.length && i < t.getColumnCount(); i++)
-                t.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
-
-            t.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-                @Override public Component getTableCellRendererComponent(
-                        JTable tbl, Object val, boolean sel, boolean foc, int row, int col) {
-                    super.getTableCellRendererComponent(tbl, val, sel, foc, row, col);
-                    if (!sel) {
-                        Object jenis = tbl.getValueAt(row, 1);
-                        if ("Trapesium 2D".equals(jenis))   setBackground(new Color(18, 26, 50));
-                        else if ("Prisma".equals(jenis))    setBackground(new Color(16, 30, 48));
-                        else                                setBackground(new Color(18, 28, 44));
-                    }
-                    setForeground(sel ? Color.WHITE : C_TEXT);
-                    setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
-                    return this;
-                }
-            });
-        }
-
-        // ══════════════════════════════════════════════════════
-        // START MULTITHREADING
-        // ══════════════════════════════════════════════════════
-        void startMultithreading() {
-            int n = (int) spinner.getValue();
-
+        JButton clrBtn = actionBtn("Bersihkan", new Color(80, 40, 40));
+        clrBtn.addActionListener(e -> {
             visualPanel.clear();
             logArea.setText("");
             tableModel.setRowCount(0);
             progressBar.setValue(0);
-            statusLabel.setText("Memulai " + n + " job...");
-            runBtn.setEnabled(false);
+            statusLabel.setText("Siap.");
+        });
+        bar.add(clrBtn);
 
-            Random rng    = new Random();
-            int poolSize  = Math.min(n, 4);
-            visualPanel.initThreads(poolSize, n);
+        bar.add(mkLabel("  Thread pool: 4 thread paralel", 11, Font.ITALIC, C_MUTED));
+        return bar;
+    }
 
-            ExecutorService pool = Executors.newFixedThreadPool(poolSize);
-            AtomicInteger done   = new AtomicInteger(0);
-            long[] gStart        = { System.currentTimeMillis() };
+    private void styleTable(JTable t) {
+        t.setBackground(C_PANEL);
+        t.setForeground(C_TEXT);
+        t.setGridColor(new Color(30, 42, 72));
+        t.setRowHeight(24);
+        t.setFont(new Font("Consolas", Font.PLAIN, 11));
+        t.setSelectionBackground(new Color(30, 60, 100));
+        t.setSelectionForeground(Color.WHITE);
+        t.setShowHorizontalLines(true);
+        t.setShowVerticalLines(true);
+        t.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-            final int LOG_LIMIT = 500;
+        JTableHeader hdr = t.getTableHeader();
+        hdr.setBackground(new Color(20, 28, 55));
+        hdr.setForeground(C_ACCENT2);
+        hdr.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        hdr.setReorderingAllowed(false);
 
-            for (int i = 0; i < n; i++) {
-                final int    idx    = i + 1;
-                final int    type   = i % 3;
-                final double atas   = Math.round((rng.nextDouble() * 8  + 2)    * 10.0) / 10.0;
-                final double bawah  = Math.round((rng.nextDouble() * 8  + atas) * 10.0) / 10.0;
-                final double tinggi = Math.round((rng.nextDouble() * 6  + 2)    * 10.0) / 10.0;
-                final double kiri   = Math.round((rng.nextDouble() * 5  + 2)    * 10.0) / 10.0;
-                final double kanan  = Math.round((rng.nextDouble() * 5  + 2)    * 10.0) / 10.0;
-                final double extra  = Math.round((rng.nextDouble() * 8  + 3)    * 10.0) / 10.0;
+        int[] w = {36, 90, 52, 52, 52, 52, 52, 60, 72, 76, 86, 106, 150, 52};
+        for (int i = 0; i < w.length && i < t.getColumnCount(); i++)
+            t.getColumnModel().getColumn(i).setPreferredWidth(w[i]);
 
-                pool.submit(() -> {
-                    String tn   = Thread.currentThread().getName();
-                    int    tIdx = threadIndex(tn, poolSize);
-                    long   t0   = System.currentTimeMillis();
+        t.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override public Component getTableCellRendererComponent(
+                    JTable tbl, Object val, boolean sel, boolean foc, int row, int col) {
+                super.getTableCellRendererComponent(tbl, val, sel, foc, row, col);
+                if (!sel) {
+                    Object jenis = tbl.getValueAt(row, 1);
+                    if ("Trapesium 2D".equals(jenis))   setBackground(new Color(18, 26, 50));
+                    else if ("Prisma".equals(jenis))    setBackground(new Color(16, 30, 48));
+                    else                                setBackground(new Color(18, 28, 44));
+                }
+                setForeground(sel ? Color.WHITE : C_TEXT);
+                setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+                return this;
+            }
+        });
+    }
 
-                    boolean doVisual = (idx <= 200) || (idx % 50 == 0);
+    // ══════════════════════════════════════════════════════
+    // START MULTITHREADING
+    // ══════════════════════════════════════════════════════
+    private void startMultithreading() {
+        int n = (int) spinner.getValue();
+
+        visualPanel.clear();
+        logArea.setText("");
+        tableModel.setRowCount(0);
+        progressBar.setValue(0);
+        statusLabel.setText("Memulai " + n + " job...");
+        runBtn.setEnabled(false);
+
+        Random rng    = new Random();
+        int poolSize  = Math.min(n, 4);
+        visualPanel.initThreads(poolSize, n);
+
+        ExecutorService pool = Executors.newFixedThreadPool(poolSize);
+        AtomicInteger done   = new AtomicInteger(0);
+        long[] gStart        = { System.currentTimeMillis() };
+
+        final int LOG_LIMIT = 500;
+
+        for (int i = 0; i < n; i++) {
+            final int    idx    = i + 1;
+            final int    type   = i % 3;
+            final double atas   = Math.round((rng.nextDouble() * 8  + 2)    * 10.0) / 10.0;
+            final double bawah  = Math.round((rng.nextDouble() * 8  + atas) * 10.0) / 10.0;
+            final double tinggi = Math.round((rng.nextDouble() * 6  + 2)    * 10.0) / 10.0;
+            final double kiri   = Math.round((rng.nextDouble() * 5  + 2)    * 10.0) / 10.0;
+            final double kanan  = Math.round((rng.nextDouble() * 5  + 2)    * 10.0) / 10.0;
+            final double extra  = Math.round((rng.nextDouble() * 8  + 3)    * 10.0) / 10.0;
+
+            pool.submit(() -> {
+                String tn   = Thread.currentThread().getName();
+                int    tIdx = threadIndex(tn, poolSize);
+                long   t0   = System.currentTimeMillis();
+
+                boolean doVisual = (idx <= 200) || (idx % 50 == 0);
+
+                if (doVisual) {
+                    SwingUtilities.invokeLater(() -> visualPanel.setJobActive(tIdx, idx, type));
+                }
+
+                String jenis;
+                double luas = 0, kel = 0, vol = Double.NaN, lp = Double.NaN;
+
+                try {
+                    if (type == 0) {
+                        jenis = "Trapesium 2D";
+                        Trapesium tt = new Trapesium(atas, bawah, tinggi, kiri, kanan);
+                        luas = tt.hitungLuas(atas, bawah, tinggi);
+                        kel  = tt.hitungKeliling(atas, bawah, kiri, kanan);
+                    } else if (type == 1) {
+                        jenis = "Prisma";
+                        PrismaTrapesium pr = new PrismaTrapesium(atas, bawah, tinggi, kiri, kanan, extra);
+                        luas = pr.hitungLuas(atas, bawah, tinggi);
+                        kel  = pr.hitungKeliling(atas, bawah, kiri, kanan);
+                        vol  = pr.hitungVolume(atas, bawah, tinggi);
+                        lp   = pr.hitungLuasPermukaan(atas, bawah, kanan, kiri, tinggi);
+                    } else {
+                        jenis = "Limas";
+                        LimasTrapesium li = new LimasTrapesium(atas, bawah, tinggi, kiri, kanan, extra);
+                        luas = li.hitungLuas(atas, bawah, tinggi);
+                        kel  = li.hitungKeliling(atas, bawah, kiri, kanan);
+                        vol  = li.hitungVolume(atas, bawah, tinggi);
+                        lp   = li.hitungLuasPermukaan(atas, bawah, tinggi, kiri, kanan);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    SwingUtilities.invokeLater(() ->
+                        appendLog("[ERROR] #" + idx + " " + ex.getMessage()));
+                    done.incrementAndGet();
+                    return;
+                }
+
+                long   elapsed = System.currentTimeMillis() - t0;
+                int    d       = done.incrementAndGet();
+                String fJenis  = jenis;
+                double fLuas   = luas, fKel = kel, fVol = vol, fLp = lp;
+                String volStr  = Double.isNaN(vol) ? "—" : String.format("%.2f", vol);
+                String lpStr   = Double.isNaN(lp)  ? "—" : String.format("%.2f", lp);
+                String shortTn = shortThread(tn);
+
+                SwingUtilities.invokeLater(() -> {
+                    tableModel.addRow(new Object[]{
+                        idx, fJenis,
+                        String.format("%.1f", atas),
+                        String.format("%.1f", bawah),
+                        String.format("%.1f", tinggi),
+                        String.format("%.1f", kiri),
+                        String.format("%.1f", kanan),
+                        type == 0 ? "—" : String.format("%.1f", extra),
+                        String.format("%.2f", fLuas),
+                        String.format("%.2f", fKel),
+                        volStr, lpStr,
+                        shortTn, elapsed + " ms"
+                    });
 
                     if (doVisual) {
-                        SwingUtilities.invokeLater(() -> visualPanel.setJobActive(tIdx, idx, type));
+                        visualPanel.setJobDone(tIdx, idx, fJenis, fLuas, fKel, fVol, fLp, elapsed);
                     }
 
-                    String jenis;
-                    double luas = 0, kel = 0, vol = Double.NaN, lp = Double.NaN;
-
-                    try {
-                        if (type == 0) {
-                            jenis = "Trapesium 2D";
-                            Trapesium tt = new Trapesium(atas, bawah, tinggi, kiri, kanan);
-                            luas = tt.hitungLuas(atas, bawah, tinggi);
-                            kel  = tt.hitungKeliling(atas, bawah, kiri, kanan);
-                        } else if (type == 1) {
-                            jenis = "Prisma";
-                            PrismaTrapesium pr = new PrismaTrapesium(atas, bawah, tinggi, kiri, kanan, extra);
-                            luas = pr.hitungLuas(atas, bawah, tinggi);
-                            kel  = pr.hitungKeliling(atas, bawah, kiri, kanan);
-                            vol  = pr.hitungVolume(atas, bawah, tinggi);
-                            lp   = pr.hitungLuasPermukaan(atas, bawah, kanan, kiri, tinggi);
-                        } else {
-                            jenis = "Limas";
-                            LimasTrapesium li = new LimasTrapesium(atas, bawah, tinggi, kiri, kanan, extra);
-                            luas = li.hitungLuas(atas, bawah, tinggi);
-                            kel  = li.hitungKeliling(atas, bawah, kiri, kanan);
-                            vol  = li.hitungVolume(atas, bawah, tinggi);
-                            lp   = li.hitungLuasPermukaan(atas, bawah, tinggi, kiri, kanan);
-                        }
-                    } catch (IllegalArgumentException ex) {
-                        SwingUtilities.invokeLater(() ->
-                            appendLog("[ERROR] #" + idx + " " + ex.getMessage()));
-                        done.incrementAndGet();
-                        return;
+                    if (d <= LOG_LIMIT) {
+                        appendLog("[" + shortTn + "]  #" + idx + " " + fJenis
+                            + " L=" + String.format("%.2f", fLuas)
+                            + " | " + elapsed + "ms");
+                    } else if (d == LOG_LIMIT + 1) {
+                        appendLog("... (log dibatasi " + LOG_LIMIT + " baris untuk performa) ...");
                     }
 
-                    long   elapsed = System.currentTimeMillis() - t0;
-                    int    d       = done.incrementAndGet();
-                    String fJenis  = jenis;
-                    double fLuas   = luas, fKel = kel, fVol = vol, fLp = lp;
-                    String volStr  = Double.isNaN(vol) ? "—" : String.format("%.2f", vol);
-                    String lpStr   = Double.isNaN(lp)  ? "—" : String.format("%.2f", lp);
-                    String shortTn = shortThread(tn);
+                    int pct = d * 100 / n;
+                    progressBar.setValue(pct);
+                    progressBar.setString(pct + "%  (" + d + "/" + n + ")");
 
-                    SwingUtilities.invokeLater(() -> {
-                        tableModel.addRow(new Object[]{
-                            idx, fJenis,
-                            String.format("%.1f", atas),
-                            String.format("%.1f", bawah),
-                            String.format("%.1f", tinggi),
-                            String.format("%.1f", kiri),
-                            String.format("%.1f", kanan),
-                            type == 0 ? "—" : String.format("%.1f", extra),
-                            String.format("%.2f", fLuas),
-                            String.format("%.2f", fKel),
-                            volStr, lpStr,
-                            shortTn, elapsed + " ms"
-                        });
-
-                        if (doVisual) {
-                            visualPanel.setJobDone(tIdx, idx, fJenis, fLuas, fKel, fVol, fLp, elapsed);
-                        }
-
-                        if (d <= LOG_LIMIT) {
-                            appendLog("[" + shortTn + "]  #" + idx + " " + fJenis
-                                + " L=" + String.format("%.2f", fLuas)
-                                + " | " + elapsed + "ms");
-                        } else if (d == LOG_LIMIT + 1) {
-                            appendLog("... (log dibatasi " + LOG_LIMIT + " baris untuk performa) ...");
-                        }
-
-                        int pct = d * 100 / n;
-                        progressBar.setValue(pct);
-                        progressBar.setString(pct + "%  (" + d + "/" + n + ")");
-
-                        if (d == n) {
-                            long total = System.currentTimeMillis() - gStart[0];
-                            statusLabel.setText("✔ Selesai " + n + " job dalam " + total + " ms");
-                            appendLog("══ SELESAI: " + n + " job | " + total + " ms | pool=" + poolSize + " thread ══");
-                            runBtn.setEnabled(true);
-                        }
-                    });
+                    if (d == n) {
+                        long total = System.currentTimeMillis() - gStart[0];
+                        statusLabel.setText("✔ Selesai " + n + " job dalam " + total + " ms");
+                        appendLog("══ SELESAI: " + n + " job | " + total + " ms | pool=" + poolSize + " thread ══");
+                        runBtn.setEnabled(true);
+                    }
                 });
-            }
-            pool.shutdown();
+            });
         }
-        
-        void appendLog(String msg) {
-            logArea.append(msg + "\n");
-            logArea.setCaretPosition(logArea.getDocument().getLength());
-        }
+        pool.shutdown();
+    }
 
-        String shortThread(String tn) {
+    private void appendLog(String msg) {
+        logArea.append(msg + "\n");
+        logArea.setCaretPosition(logArea.getDocument().getLength());
+    }
+
+    private String shortThread(String tn) {
+        String[] p = tn.split("-");
+        return "T-" + p[p.length - 1];
+    }
+
+    private int threadIndex(String tn, int poolSize) {
+        try {
             String[] p = tn.split("-");
-            return "T-" + p[p.length - 1];
-        }
-
-        int threadIndex(String tn, int poolSize) {
-            try {
-                String[] p = tn.split("-");
-                return (Integer.parseInt(p[p.length - 1]) - 1) % poolSize;
-            } catch (Exception e) {
-                return 0;
-            }
+            return (Integer.parseInt(p[p.length - 1]) - 1) % poolSize;
+        } catch (Exception e) {
+            return 0;
         }
     }
 
     // ══════════════════════════════════════════════════════════════
-    //  THREAD VISUAL PANEL
+    //  SHARED HELPERS
+    // ══════════════════════════════════════════════════════════════
+    static JLabel mkLabel(String text, int size, int style, Color color) {
+        JLabel l = new JLabel(text);
+        l.setFont(new Font("Segoe UI", style, size));
+        l.setForeground(color);
+        return l;
+    }
+
+    static JPanel buildHeader(String title, String sub) {
+        JPanel h = new JPanel() {
+            @Override protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setPaint(new GradientPaint(0,0,new Color(18,24,46),getWidth(),0,new Color(12,16,32)));
+                g2.fillRect(0,0,getWidth(),getHeight());
+                g2.setColor(C_BORDER); g2.fillRect(0, getHeight()-1, getWidth(), 1);
+            }
+        };
+        h.setLayout(new BoxLayout(h, BoxLayout.Y_AXIS));
+        h.setBorder(BorderFactory.createEmptyBorder(14, 20, 14, 20));
+        JLabel t = mkLabel(title, 18, Font.BOLD, C_TEXT);
+        JLabel s = mkLabel(sub,   12, Font.PLAIN, C_MUTED);
+        h.add(t); h.add(Box.createVerticalStrut(3)); h.add(s);
+        return h;
+    }
+
+    static JTextField field() {
+        JTextField tf = new JTextField();
+        tf.setBackground(new Color(28, 34, 60));
+        tf.setForeground(C_TEXT);
+        tf.setCaretColor(C_ACCENT);
+        tf.setFont(new Font("Consolas", Font.PLAIN, 13));
+        tf.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(C_BORDER),
+            BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        return tf;
+    }
+
+    static JPanel formPanel() {
+        JPanel p = new JPanel();
+        p.setOpaque(false);
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        return p;
+    }
+
+    static void addRow(JPanel p, String label, JTextField tf) {
+        JPanel row = new JPanel(new BorderLayout(8, 0));
+        row.setOpaque(false);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        JLabel l = mkLabel(label, 12, Font.PLAIN, C_MUTED);
+        l.setPreferredSize(new Dimension(120, 28));
+        row.add(l, BorderLayout.WEST);
+        row.add(tf, BorderLayout.CENTER);
+        p.add(row); p.add(Box.createVerticalStrut(5));
+    }
+
+    static JPanel wrap(JPanel p) {
+        JPanel outer = new JPanel(new BorderLayout());
+        outer.setBackground(C_PANEL);
+        outer.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
+        outer.add(p, BorderLayout.NORTH);
+        return outer;
+    }
+
+    static JButton actionBtn(String text, Color base) {
+        JButton b = new JButton(text) {
+            boolean hov = false;
+            { setContentAreaFilled(false); setBorderPainted(false); setFocusPainted(false);
+              setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+              addMouseListener(new MouseAdapter() {
+                  public void mouseEntered(MouseEvent e) { hov = true;  repaint(); }
+                  public void mouseExited (MouseEvent e) { hov = false; repaint(); }
+              });
+            }
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(hov ? base.brighter() : base);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        b.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        b.setForeground(Color.WHITE);
+        b.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
+        return b;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  THREAD VISUAL PANEL (INNER CLASS)
     // ══════════════════════════════════════════════════════════════
     static class ThreadVisualPanel extends JPanel {
 
@@ -972,97 +983,6 @@ public class Menu1Panel extends JPanel {
                 g2.drawString(msStr, x + (w - fm4.stringWidth(msStr)) / 2, y + h - 4);
             }
         }
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  SHARED HELPERS
-    // ══════════════════════════════════════════════════════════════
-    static JLabel mkLabel(String text, int size, int style, Color color) {
-        JLabel l = new JLabel(text);
-        l.setFont(new Font("Segoe UI", style, size));
-        l.setForeground(color);
-        return l;
-    }
-
-    static JPanel buildHeader(String title, String sub) {
-        JPanel h = new JPanel() {
-            @Override protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setPaint(new GradientPaint(0,0,new Color(18,24,46),getWidth(),0,new Color(12,16,32)));
-                g2.fillRect(0,0,getWidth(),getHeight());
-                g2.setColor(C_BORDER); g2.fillRect(0, getHeight()-1, getWidth(), 1);
-            }
-        };
-        h.setLayout(new BoxLayout(h, BoxLayout.Y_AXIS));
-        h.setBorder(BorderFactory.createEmptyBorder(14, 20, 14, 20));
-        JLabel t = mkLabel(title, 18, Font.BOLD, C_TEXT);
-        JLabel s = mkLabel(sub,   12, Font.PLAIN, C_MUTED);
-        h.add(t); h.add(Box.createVerticalStrut(3)); h.add(s);
-        return h;
-    }
-
-    static JTextField field() {
-        JTextField tf = new JTextField();
-        tf.setBackground(new Color(28, 34, 60));
-        tf.setForeground(C_TEXT);
-        tf.setCaretColor(C_ACCENT);
-        tf.setFont(new Font("Consolas", Font.PLAIN, 13));
-        tf.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(C_BORDER),
-            BorderFactory.createEmptyBorder(4, 8, 4, 8)));
-        return tf;
-    }
-
-    static JPanel formPanel() {
-        JPanel p = new JPanel();
-        p.setOpaque(false);
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        return p;
-    }
-
-    static void addRow(JPanel p, String label, JTextField tf) {
-        JPanel row = new JPanel(new BorderLayout(8, 0));
-        row.setOpaque(false);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-        JLabel l = mkLabel(label, 12, Font.PLAIN, C_MUTED);
-        l.setPreferredSize(new Dimension(120, 28));
-        row.add(l, BorderLayout.WEST);
-        row.add(tf, BorderLayout.CENTER);
-        p.add(row); p.add(Box.createVerticalStrut(5));
-    }
-
-    static JPanel wrap(JPanel p) {
-        JPanel outer = new JPanel(new BorderLayout());
-        outer.setBackground(C_PANEL);
-        outer.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
-        outer.add(p, BorderLayout.NORTH);
-        return outer;
-    }
-
-    static JButton actionBtn(String text, Color base) {
-        JButton b = new JButton(text) {
-            boolean hov = false;
-            { setContentAreaFilled(false); setBorderPainted(false); setFocusPainted(false);
-              setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-              addMouseListener(new MouseAdapter() {
-                  public void mouseEntered(MouseEvent e) { hov = true;  repaint(); }
-                  public void mouseExited (MouseEvent e) { hov = false; repaint(); }
-              });
-            }
-            @Override protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(hov ? base.brighter() : base);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        b.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        b.setForeground(Color.WHITE);
-        b.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
-        return b;
     }
 
     public static void main(String[] args) {
