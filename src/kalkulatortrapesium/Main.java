@@ -123,218 +123,333 @@ public class Main extends JFrame {
         return b;
     }
 
+
     // ══════════════════════════════════════════════════════════════
     //  MENU 1 — INPUT MANUAL
     // ══════════════════════════════════════════════════════════════
-    class Menu1Panel extends JPanel {
-        JTextField[] f2D = new JTextField[5];
-        JTextField[] fPr = new JTextField[6];
-        JTextField[] fLi = new JTextField[6];
+public class Menu1Panel extends JPanel {
 
-        JTextArea result;
-        JLabel    resultTitle;
+    // Konstanta warna (sesuaikan dengan yang ada di kelas utama)
+    private static final Color C_BG      = new Color(18, 24, 44);
+    private static final Color C_PANEL   = new Color(28, 36, 64);
+    private static final Color C_TEXT    = Color.WHITE;
+    private static final Color C_TEXTPILIH    = Color.BLACK;
+    private static final Color C_ACCENT  = new Color(0, 180, 255);
+    private static final Color C_ACCENT2 = new Color(255, 200, 50);
+    private static final Color C_ACCENT3 = new Color(255, 100, 100);
+    private static final Color C_BORDER  = new Color(80, 80, 100);
 
-        Menu1Panel() {
-            setBackground(C_BG);
-            setLayout(new BorderLayout());
-            add(buildHeader("Input Manual",
+    // Field input untuk masing-masing bangun
+    private JTextField[] f2D = new JTextField[5];
+    private JTextField[] fPr = new JTextField[6];
+    private JTextField[] fLi = new JTextField[6];
+
+    // Area hasil dan judul
+    private JTextArea result;
+    private JLabel    resultTitle;
+
+    // Komponen pemilihan
+    private JComboBox<String> shapeSelector;
+    private JPanel            cardPanel;
+    private CardLayout        cardLayout;
+
+    public Menu1Panel() {
+        setBackground(C_BG);
+        setLayout(new BorderLayout());
+
+        // Header
+        add(buildHeader("Input Manual",
                 "Masukkan panjang sisi untuk menghitung luas, keliling, volume, dan luas permukaan."),
                 BorderLayout.NORTH);
 
-            JPanel body = new JPanel(new BorderLayout(14, 0));
-            body.setBackground(C_BG);
-            body.setBorder(BorderFactory.createEmptyBorder(14, 18, 14, 18));
+        // Body
+        JPanel body = new JPanel(new BorderLayout(14, 0));
+        body.setBackground(C_BG);
+        body.setBorder(BorderFactory.createEmptyBorder(14, 18, 14, 18));
 
-            JTabbedPane tabs = new JTabbedPane() {
-                @Override public void updateUI() {
-                    super.updateUI();
-                    setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
-                        @Override protected void paintTabBackground(Graphics g, int tabPlacement,
-                                int tabIndex, int x, int y, int w, int h, boolean isSelected) {
-                            Graphics2D g2 = (Graphics2D) g;
-                            Color bg = isSelected ? new Color(28, 36, 64) : new Color(14, 18, 34);
-                            g2.setColor(bg);
-                            g2.fillRect(x, y, w, h);
-                        }
-                        @Override protected void paintTabBorder(Graphics g, int tabPlacement,
-                                int tabIndex, int x, int y, int w, int h, boolean isSelected) {
-                            g.setColor(isSelected ? C_ACCENT2 : C_BORDER);
-                            g.drawRect(x, y, w - 1, h - 1);
-                        }
-                        @Override protected void paintContentBorder(Graphics g, int tabPlacement, int selectedIndex) {
-                            g.setColor(C_BORDER);
-                            g.drawRect(tabAreaInsets.left, calculateTabAreaHeight(tabPlacement, runCount, maxTabHeight) + tabAreaInsets.top,
-                                    getWidth() - tabAreaInsets.left - tabAreaInsets.right - 1,
-                                    getHeight() - calculateTabAreaHeight(tabPlacement, runCount, maxTabHeight) - tabAreaInsets.top - tabAreaInsets.bottom - 1);
-                        }
-                        @Override protected void paintFocusIndicator(Graphics g, int tabPlacement, Rectangle[] rects, int tabIndex, Rectangle iconRect, Rectangle textRect, boolean isSelected) {}
-                    });
-                    setBackground(new Color(14, 18, 34));
-                    setForeground(C_TEXT);
-                    setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        // Panel kiri: pilihan + input
+        JPanel left = new JPanel(new BorderLayout(0, 10));
+        left.setBackground(C_BG);
+
+        // Combo box untuk memilih jenis bangun
+        shapeSelector = new JComboBox<>(new String[]{"Trapesium 2D", "Prisma", "Limas"});
+        shapeSelector.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        shapeSelector.setBackground(C_PANEL);
+        shapeSelector.setForeground(C_TEXTPILIH);
+        shapeSelector.setBorder(BorderFactory.createLineBorder(C_BORDER));
+        left.add(shapeSelector, BorderLayout.NORTH);
+
+        // CardLayout untuk input fields
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+        cardPanel.setBackground(C_BG);
+
+        // Buat tiga panel input (tanpa tombol masing-masing)
+        cardPanel.add(createInputPanel2D(), "2D");
+        cardPanel.add(createInputPanelPrisma(), "Prisma");
+        cardPanel.add(createInputPanelLimas(), "Limas");
+
+        left.add(cardPanel, BorderLayout.CENTER);
+
+        // Tombol Hitung tunggal
+        JButton btnHitung = new JButton("Hitung");
+        btnHitung.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnHitung.setBackground(C_ACCENT2);
+        btnHitung.setForeground(Color.BLACK);
+        btnHitung.setFocusPainted(false);
+        btnHitung.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnHitung.addActionListener(e -> hitung()); // ← inti: if-else di sini
+        left.add(btnHitung, BorderLayout.SOUTH);
+
+        // Atur lebar preferensi
+        left.setPreferredSize(new Dimension(340, 0));
+        body.add(left, BorderLayout.WEST);
+
+        // Panel kanan: hasil
+        JPanel right = new JPanel(new BorderLayout(0, 8));
+        right.setBackground(C_BG);
+        resultTitle = mkLabel("Hasil Perhitungan", 13, Font.BOLD, C_ACCENT2);
+        right.add(resultTitle, BorderLayout.NORTH);
+
+        result = new JTextArea("Pilih jenis bangun dan tekan Hitung...");
+        result.setEditable(false);
+        result.setBackground(C_PANEL);
+        result.setForeground(C_TEXT);
+        result.setFont(new Font("Consolas", Font.PLAIN, 12));
+        result.setBorder(BorderFactory.createEmptyBorder(12, 14, 12, 14));
+        result.setLineWrap(true);
+        JScrollPane rsp = new JScrollPane(result);
+        rsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
+        right.add(rsp, BorderLayout.CENTER);
+
+        body.add(right, BorderLayout.CENTER);
+        add(body, BorderLayout.CENTER);
+
+        // Tampilkan panel pertama secara default
+        shapeSelector.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                String selected = (String) e.getItem();
+                switch (selected) {
+                    case "Trapesium 2D": cardLayout.show(cardPanel, "2D"); break;
+                    case "Prisma":       cardLayout.show(cardPanel, "Prisma"); break;
+                    case "Limas":        cardLayout.show(cardPanel, "Limas"); break;
                 }
-            };
-            tabs.setOpaque(true);
-            tabs.addTab("Trapesium 2D", inputForm2D());
-            tabs.addTab("Prisma",        inputFormPrisma());
-            tabs.addTab("Limas",         inputFormLimas());
-            tabs.setPreferredSize(new Dimension(340, 0));
-            body.add(tabs, BorderLayout.WEST);
-
-            JPanel right = new JPanel(new BorderLayout(0, 8));
-            right.setBackground(C_BG);
-            resultTitle = mkLabel("Hasil Perhitungan", 13, Font.BOLD, C_ACCENT2);
-            right.add(resultTitle, BorderLayout.NORTH);
-
-            result = new JTextArea("Pilih jenis bangun dan tekan Hitung...");
-            result.setEditable(false);
-            result.setBackground(C_PANEL);
-            result.setForeground(C_TEXT);
-            result.setFont(new Font("Consolas", Font.PLAIN, 12));
-            result.setBorder(BorderFactory.createEmptyBorder(12, 14, 12, 14));
-            result.setLineWrap(true);
-            JScrollPane rsp = new JScrollPane(result);
-            rsp.setBorder(BorderFactory.createLineBorder(C_BORDER));
-            right.add(rsp, BorderLayout.CENTER);
-            body.add(right, BorderLayout.CENTER);
-            add(body, BorderLayout.CENTER);
-        }
-
-        JPanel inputForm2D() {
-            JPanel p = formPanel();
-            String[] lbl = {"Sisi Atas","Sisi Bawah","Tinggi","Sisi Kiri","Sisi Kanan"};
-            for (int i = 0; i < 5; i++) { f2D[i] = field(); addRow(p, lbl[i], f2D[i]); }
-            JButton btn = actionBtn("Hitung Trapesium 2D", C_ACCENT2);
-            btn.addActionListener(e -> hitung2D());
-            p.add(Box.createVerticalStrut(12)); p.add(btn);
-            return wrap(p);
-        }
-
-        JPanel inputFormPrisma() {
-            JPanel p = formPanel();
-            String[] lbl = {"Sisi Atas","Sisi Bawah","Tinggi Alas","Sisi Kiri","Sisi Kanan","Tinggi Prisma"};
-            for (int i = 0; i < 6; i++) { fPr[i] = field(); addRow(p, lbl[i], fPr[i]); }
-            JButton btn = actionBtn("Hitung Prisma", C_ACCENT);
-            btn.addActionListener(e -> hitungPrisma());
-            p.add(Box.createVerticalStrut(12)); p.add(btn);
-            return wrap(p);
-        }
-
-        JPanel inputFormLimas() {
-            JPanel p = formPanel();
-            String[] lbl = {"Sisi Atas","Sisi Bawah","Tinggi Alas","Sisi Kiri","Sisi Kanan","Tinggi Limas"};
-            for (int i = 0; i < 6; i++) { fLi[i] = field(); addRow(p, lbl[i], fLi[i]); }
-            JButton btn = actionBtn("Hitung Limas", C_ACCENT3);
-            btn.addActionListener(e -> hitungLimas());
-            p.add(Box.createVerticalStrut(12)); p.add(btn);
-            return wrap(p);
-        }
-
-        // ══════════════════════════════════════════════════════
-        // HITUNG TRAPESIUM 2D
-        // ══════════════════════════════════════════════════════
-        void hitung2D() {
-            try {
-                double atas=dbl(f2D[0]),bawah=dbl(f2D[1]),tinggi=dbl(f2D[2]),kiri=dbl(f2D[3]),kanan=dbl(f2D[4]);
-                Trapesium t = new Trapesium(atas,bawah,tinggi,kiri,kanan);
-                double L=t.hitungLuas(), K=t.hitungKeliling();
-                resultTitle.setText("Hasil — Trapesium 2D");
-                result.setText(
-                    "══ TRAPESIUM 2D ══════════════════════\n\n" +
-                    "  Input:\n" +
-                    "    Sisi Atas  = "+atas+"\n    Sisi Bawah = "+bawah+
-                    "\n    Tinggi    = "+tinggi+"\n    Sisi Kiri  = "+kiri+"\n    Sisi Kanan = "+kanan+"\n\n"+
-                    "  ── Luas ─────────────────────────────\n"+
-                    "  L = ½ × (atas + bawah) × tinggi\n"+
-                    String.format("    = ½ × (%.2f + %.2f) × %.2f\n",atas,bawah,tinggi)+
-                    String.format("    = %.2f\n\n",L)+
-                    "  ── Keliling ─────────────────────────\n"+
-                    "  K = atas + bawah + kiri + kanan\n"+
-                    String.format("    = %.2f + %.2f + %.2f + %.2f\n",atas,bawah,kiri,kanan)+
-                    String.format("    = %.2f\n",K));
-            } catch (NumberFormatException ex) {
-                showErr("Input harus berupa angka.");
-            } catch (IllegalArgumentException ex) {
-                showErr(ex.getMessage());
             }
-        }
+        });
+    }
 
-        // ══════════════════════════════════════════════════════
-        // HITUNG PRISMA
-        // ══════════════════════════════════════════════════════
-        void hitungPrisma() {
-            try {
-                double a=dbl(fPr[0]),b=dbl(fPr[1]),t=dbl(fPr[2]),ki=dbl(fPr[3]),ka=dbl(fPr[4]),p=dbl(fPr[5]);
-                PrismaTrapesium pr = new PrismaTrapesium(a,b,t,ki,ka,p);
-                double L=pr.hitungLuas(a,b,t), K=pr.hitungKeliling(a,b,ki,ka);
-                double V=pr.hitungVolume(a,b,t), LP=pr.hitungLuasPermukaan(a,b,ka,ki,t);
-                resultTitle.setText("Hasil — Prisma Trapesium");
-                result.setText(
-                    "══ PRISMA TRAPESIUM ══════════════════\n\n"+
-                    "  Input:\n    Atas="+a+" Bawah="+b+" Tinggi="+t+
-                    "\n    Kiri="+ki+" Kanan="+ka+" Tinggi Prisma="+p+"\n\n"+
-                    "  ── Luas Alas ────────────────────────\n"+
-                    String.format("  L  = ½×(%.2f+%.2f)×%.2f = %.2f\n\n",a,b,t,L)+
-                    "  ── Keliling Alas ────────────────────\n"+
-                    String.format("  K  = %.2f\n\n",K)+
-                    "  ── Volume ───────────────────────────\n"+
-                    "  V  = Luas Alas × Tinggi Prisma\n"+
-                    String.format("     = %.2f × %.2f = %.2f\n\n",L,p,V)+
-                    "  ── Luas Permukaan ───────────────────\n"+
-                    "  LP = (2×L) + (a+b+ki+ka)×panjang\n"+
-                    String.format("     = (2×%.2f)+(%.2f+%.2f+%.2f+%.2f)×%.2f\n",L,a,b,ki,ka,p)+
-                    String.format("     = %.2f\n",LP));
-            } catch (NumberFormatException ex) {
-                showErr("Input harus berupa angka.");
-            } catch (IllegalArgumentException ex) {
-                showErr(ex.getMessage());
+    // ─── Helper untuk membuat label ──────────────────────────────────────────
+    private JLabel mkLabel(String text, int size, int style, Color color) {
+        JLabel lbl = new JLabel(text);
+        lbl.setFont(new Font("Segoe UI", style, size));
+        lbl.setForeground(color);
+        return lbl;
+    }
+
+    private JPanel buildHeader(String title, String subtitle) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(C_BG);
+        p.setBorder(BorderFactory.createEmptyBorder(16, 20, 12, 20));
+        JLabel t = mkLabel(title, 18, Font.BOLD, C_ACCENT2);
+        JLabel s = mkLabel(subtitle, 12, Font.PLAIN, C_TEXT);
+        p.add(t, BorderLayout.NORTH);
+        p.add(s, BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel formPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(C_BG);
+        p.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        return p;
+    }
+
+    private JTextField field() {
+        JTextField tf = new JTextField(8);
+        tf.setBackground(C_PANEL);
+        tf.setForeground(C_TEXT);
+        tf.setCaretColor(C_TEXT);
+        tf.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(C_BORDER),
+                BorderFactory.createEmptyBorder(4, 6, 4, 6)
+        ));
+        tf.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        return tf;
+    }
+
+    private void addRow(JPanel parent, String label, JTextField field) {
+        JPanel row = new JPanel(new BorderLayout(8, 0));
+        row.setBackground(C_BG);
+        JLabel lbl = mkLabel(label, 12, Font.PLAIN, C_TEXT);
+        lbl.setPreferredSize(new Dimension(100, 24));
+        row.add(lbl, BorderLayout.WEST);
+        row.add(field, BorderLayout.CENTER);
+        parent.add(row);
+        parent.add(Box.createVerticalStrut(6));
+    }
+
+    private JPanel wrap(JPanel p) {
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(C_BG);
+        wrapper.add(p, BorderLayout.NORTH);
+        return wrapper;
+    }
+
+    // ─── Panel input untuk masing-masing bangun (tanpa tombol) ──────────────
+    private JPanel createInputPanel2D() {
+        JPanel p = formPanel();
+        String[] lbl = {"Sisi Atas", "Sisi Bawah", "Tinggi", "Sisi Kiri", "Sisi Kanan"};
+        for (int i = 0; i < 5; i++) {
+            f2D[i] = field();
+            addRow(p, lbl[i], f2D[i]);
+        }
+        return wrap(p);
+    }
+
+    private JPanel createInputPanelPrisma() {
+        JPanel p = formPanel();
+        String[] lbl = {"Sisi Atas", "Sisi Bawah", "Tinggi Alas", "Sisi Kiri", "Sisi Kanan", "Tinggi Prisma"};
+        for (int i = 0; i < 6; i++) {
+            fPr[i] = field();
+            addRow(p, lbl[i], fPr[i]);
+        }
+        return wrap(p);
+    }
+
+    private JPanel createInputPanelLimas() {
+        JPanel p = formPanel();
+        String[] lbl = {"Sisi Atas", "Sisi Bawah", "Tinggi Alas", "Sisi Kiri", "Sisi Kanan", "Tinggi Limas"};
+        for (int i = 0; i < 6; i++) {
+            fLi[i] = field();
+            addRow(p, lbl[i], fLi[i]);
+        }
+        return wrap(p);
+    }
+
+    // ─── Method hitung utama dengan if-else ──────────────────────────────────
+    private void hitung() {
+        int selected = shapeSelector.getSelectedIndex();
+        try {
+            if (selected == 0) {
+                hitung2D();
+            } else if (selected == 1) {
+                hitungPrisma();
+            } else if (selected == 2) {
+                hitungLimas();
             }
-        }
-
-        // ══════════════════════════════════════════════════════
-        // HITUNG LIMAS
-        // ══════════════════════════════════════════════════════
-        void hitungLimas() {
-            try {
-                double a=dbl(fLi[0]),b=dbl(fLi[1]),t=dbl(fLi[2]),ki=dbl(fLi[3]),ka=dbl(fLi[4]),tl=dbl(fLi[5]);
-                LimasTrapesium li = new LimasTrapesium(a,b,t,ki,ka,tl);
-                double L=li.hitungLuas(a,b,t), K=li.hitungKeliling(a,b,ki,ka);
-                double V=li.hitungVolume(a,b,t), LP=li.hitungLuasPermukaan(a,b,t,ki,ka);
-                double pAB=(b-a)/2.0, pKK=t/2.0;
-                double apAB=Math.sqrt(tl*tl+pAB*pAB), apKK=Math.sqrt(tl*tl+pKK*pKK);
-                resultTitle.setText("Hasil — Limas Trapesium");
-                result.setText(
-                    "══ LIMAS TRAPESIUM ═══════════════════\n\n"+
-                    "  Input:\n    Atas="+a+" Bawah="+b+" Tinggi="+t+
-                    "\n    Kiri="+ki+" Kanan="+ka+" TinggiLimas="+tl+"\n\n"+
-                    "  ── Luas Alas ────────────────────────\n"+
-                    String.format("  L  = ½×(%.2f+%.2f)×%.2f = %.2f\n\n",a,b,t,L)+
-                    "  ── Keliling Alas ────────────────────\n"+
-                    String.format("  K  = %.2f\n\n",K)+
-                    "  ── Apotema ──────────────────────────\n"+
-                    String.format("  apAB = √(%.2f²+%.2f²) = %.4f\n",tl,pAB,apAB)+
-                    String.format("  apKK = √(%.2f²+%.2f²) = %.4f\n\n",tl,pKK,apKK)+
-                    "  ── Volume ───────────────────────────\n"+
-                    String.format("  V  = ⅓ × %.2f × %.2f = %.2f\n\n",L,tl,V)+
-                    "  ── Luas Permukaan ───────────────────\n"+
-                    String.format("  LP = %.2f\n",LP));
-            } catch (NumberFormatException ex) {
-                showErr("Input harus berupa angka.");
-            } catch (IllegalArgumentException ex) {
-                showErr(ex.getMessage());
-            }
-        }
-
-        void showErr(String msg) {
-            resultTitle.setText("⚠ Input Tidak Valid");
-            result.setText("Detail: " + msg);
-        }
-
-        double dbl(JTextField tf) {
-            return Double.parseDouble(tf.getText().trim());
+        } catch (Exception ex) {
+            showErr("Terjadi kesalahan: " + ex.getMessage());
         }
     }
 
+    // ─── Hitung Trapesium 2D (sama seperti asli) ─────────────────────────────
+    void hitung2D() {
+        try {
+            double atas = dbl(f2D[0]), bawah = dbl(f2D[1]), tinggi = dbl(f2D[2]);
+            double kiri = dbl(f2D[3]), kanan = dbl(f2D[4]);
+            Trapesium t = new Trapesium(atas, bawah, tinggi, kiri, kanan);
+            double L = t.hitungLuas(), K = t.hitungKeliling();
+            resultTitle.setText("Hasil — Trapesium 2D");
+            result.setText(
+                "══ TRAPESIUM 2D ══════════════════════\n\n" +
+                "  Input:\n" +
+                "    Sisi Atas  = " + atas + "\n    Sisi Bawah = " + bawah +
+                "\n    Tinggi    = " + tinggi + "\n    Sisi Kiri  = " + kiri + "\n    Sisi Kanan = " + kanan + "\n\n" +
+                "  ── Luas ─────────────────────────────\n" +
+                "  L = ½ × (atas + bawah) × tinggi\n" +
+                String.format("    = ½ × (%.2f + %.2f) × %.2f\n", atas, bawah, tinggi) +
+                String.format("    = %.2f\n\n", L) +
+                "  ── Keliling ─────────────────────────\n" +
+                "  K = atas + bawah + kiri + kanan\n" +
+                String.format("    = %.2f + %.2f + %.2f + %.2f\n", atas, bawah, kiri, kanan) +
+                String.format("    = %.2f\n", K));
+        } catch (NumberFormatException ex) {
+            showErr("Input harus berupa angka.");
+        } catch (IllegalArgumentException ex) {
+            showErr(ex.getMessage());
+        }
+    }
+
+    // ─── Hitung Prisma ─────────────────────────────────────────────────────────
+    void hitungPrisma() {
+        try {
+            double a = dbl(fPr[0]), b = dbl(fPr[1]), t = dbl(fPr[2]);
+            double ki = dbl(fPr[3]), ka = dbl(fPr[4]), p = dbl(fPr[5]);
+            PrismaTrapesium pr = new PrismaTrapesium(a, b, t, ki, ka, p);
+            double L = pr.hitungLuas(a, b, t);
+            double K = pr.hitungKeliling(a, b, ki, ka);
+            double V = pr.hitungVolume(a, b, t);
+            double LP = pr.hitungLuasPermukaan(a, b, ka, ki, t);
+            resultTitle.setText("Hasil — Prisma Trapesium");
+            result.setText(
+                "══ PRISMA TRAPESIUM ══════════════════\n\n" +
+                "  Input:\n    Atas=" + a + " Bawah=" + b + " Tinggi=" + t +
+                "\n    Kiri=" + ki + " Kanan=" + ka + " Tinggi Prisma=" + p + "\n\n" +
+                "  ── Luas Alas ────────────────────────\n" +
+                String.format("  L  = ½×(%.2f+%.2f)×%.2f = %.2f\n\n", a, b, t, L) +
+                "  ── Keliling Alas ────────────────────\n" +
+                String.format("  K  = %.2f\n\n", K) +
+                "  ── Volume ───────────────────────────\n" +
+                "  V  = Luas Alas × Tinggi Prisma\n" +
+                String.format("     = %.2f × %.2f = %.2f\n\n", L, p, V) +
+                "  ── Luas Permukaan ───────────────────\n" +
+                "  LP = (2×L) + (a+b+ki+ka)×panjang\n" +
+                String.format("     = (2×%.2f)+(%.2f+%.2f+%.2f+%.2f)×%.2f\n", L, a, b, ki, ka, p) +
+                String.format("     = %.2f\n", LP));
+        } catch (NumberFormatException ex) {
+            showErr("Input harus berupa angka.");
+        } catch (IllegalArgumentException ex) {
+            showErr(ex.getMessage());
+        }
+    }
+
+    // ─── Hitung Limas ──────────────────────────────────────────────────────────
+    void hitungLimas() {
+        try {
+            double a = dbl(fLi[0]), b = dbl(fLi[1]), t = dbl(fLi[2]);
+            double ki = dbl(fLi[3]), ka = dbl(fLi[4]), tl = dbl(fLi[5]);
+            LimasTrapesium li = new LimasTrapesium(a, b, t, ki, ka, tl);
+            double L = li.hitungLuas(a, b, t);
+            double K = li.hitungKeliling(a, b, ki, ka);
+            double V = li.hitungVolume(a, b, t);
+            double LP = li.hitungLuasPermukaan(a, b, t, ki, ka);
+            double pAB = (b - a) / 2.0, pKK = t / 2.0;
+            double apAB = Math.sqrt(tl * tl + pAB * pAB);
+            double apKK = Math.sqrt(tl * tl + pKK * pKK);
+            resultTitle.setText("Hasil — Limas Trapesium");
+            result.setText(
+                "══ LIMAS TRAPESIUM ═══════════════════\n\n" +
+                "  Input:\n    Atas=" + a + " Bawah=" + b + " Tinggi=" + t +
+                "\n    Kiri=" + ki + " Kanan=" + ka + " TinggiLimas=" + tl + "\n\n" +
+                "  ── Luas Alas ────────────────────────\n" +
+                String.format("  L  = ½×(%.2f+%.2f)×%.2f = %.2f\n\n", a, b, t, L) +
+                "  ── Keliling Alas ────────────────────\n" +
+                String.format("  K  = %.2f\n\n", K) +
+                "  ── Apotema ──────────────────────────\n" +
+                String.format("  apAB = √(%.2f²+%.2f²) = %.4f\n", tl, pAB, apAB) +
+                String.format("  apKK = √(%.2f²+%.2f²) = %.4f\n\n", tl, pKK, apKK) +
+                "  ── Volume ───────────────────────────\n" +
+                String.format("  V  = ⅓ × %.2f × %.2f = %.2f\n\n", L, tl, V) +
+                "  ── Luas Permukaan ───────────────────\n" +
+                String.format("  LP = %.2f\n", LP));
+        } catch (NumberFormatException ex) {
+            showErr("Input harus berupa angka.");
+        } catch (IllegalArgumentException ex) {
+            showErr(ex.getMessage());
+        }
+    }
+
+    private void showErr(String msg) {
+        resultTitle.setText("⚠ Input Tidak Valid");
+        result.setText("Detail: " + msg);
+    }
+
+    private double dbl(JTextField tf) {
+        return Double.parseDouble(tf.getText().trim());
+    }
+}
+    
     // ══════════════════════════════════════════════════════════════
     //  MENU 2 — MULTITHREADING VISUAL
     // ══════════════════════════════════════════════════════════════
